@@ -201,19 +201,6 @@ body {
     box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
 }
 
-.demo-credentials {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
-    text-align: center;
-    border-left: 4px solid #667eea;
-    margin-top: 20px;
-}
-
-.demo-credentials p {
-    font-size: 0.9rem;
-    color: #666;
-}
 
 .logo-img {
     height: 40px;
