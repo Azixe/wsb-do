@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize user profile dropdown
+    initUserProfile();
+    
     const products = [
         {
             name: 'Beras Raja Platinum 5kg',
@@ -90,7 +93,65 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// User Profile Functions
+function initUserProfile() {
+    const userProfile = document.getElementById('userProfile');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const userName = document.getElementById('userName');
+    
+    // Set username from localStorage if available
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+        userName.textContent = storedUsername;
+    }
+    
+    // Toggle dropdown on profile click
+    userProfile.addEventListener('click', function(e) {
+        e.stopPropagation();
+        userProfile.classList.toggle('active');
+        dropdownMenu.classList.toggle('show');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!userProfile.contains(e.target)) {
+            userProfile.classList.remove('active');
+            dropdownMenu.classList.remove('show');
+        }
+    });
+    
+    // Prevent dropdown close when clicking inside dropdown
+    dropdownMenu.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+}
+
+function showProfile() {
+    alert('Fitur Profil Saya akan segera hadir!');
+    // Close dropdown after action
+    document.getElementById('userProfile').classList.remove('active');
+    document.getElementById('dropdownMenu').classList.remove('show');
+}
+
+function showSettings() {
+    alert('Fitur Pengaturan akan segera hadir!');
+    // Close dropdown after action
+    document.getElementById('userProfile').classList.remove('active');
+    document.getElementById('dropdownMenu').classList.remove('show');
+}
+
 function logout() {
-    alert('Logout berhasil!');
-    window.location.href = 'index.html'; // atau arahkan ke halaman login kamu
+    // Close dropdown first
+    document.getElementById('userProfile').classList.remove('active');
+    document.getElementById('dropdownMenu').classList.remove('show');
+    
+    // Confirm logout
+    if (confirm('Apakah Anda yakin ingin keluar?')) {
+        // Clear localStorage
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('username');
+        
+        // Redirect to login page
+        window.location.href = 'index.html';
+    }
 }
