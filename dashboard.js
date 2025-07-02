@@ -32,70 +32,332 @@ function addToCart(product) {
 }
 
 function showCartNotification(message) {
+    // Remove existing notifications
+    const existingNotification = document.querySelector('.cart-notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+
     // Create notification element
     const notification = document.createElement('div');
     notification.className = 'cart-notification';
-    notification.textContent = message;
+    notification.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <span>${message}</span>
+    `;
     
     // Add styles
     notification.style.cssText = `
         position: fixed;
-        top: 80px;
-        right: 20px;
-        background: #10b981;
-        color: white;
-        padding: 12px 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        top: 100px;
+        right: 24px;
+        background: white;
+        color: #059669;
+        padding: 16px 20px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #10b981;
         z-index: 1000;
         font-size: 14px;
         font-weight: 500;
         opacity: 0;
         transform: translateX(100px);
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        max-width: 300px;
     `;
     
     document.body.appendChild(notification);
     
-    // Show notification
-    setTimeout(() => {
+    // Show notification with animation
+    requestAnimationFrame(() => {
         notification.style.opacity = '1';
         notification.style.transform = 'translateX(0)';
-    }, 100);
+    });
     
     // Hide notification after 3 seconds
     setTimeout(() => {
         notification.style.opacity = '0';
         notification.style.transform = 'translateX(100px)';
         setTimeout(() => {
-            document.body.removeChild(notification);
+            if (notification.parentNode) {
+                notification.remove();
+            }
         }, 300);
     }, 3000);
 }
 
 function goToCheckout() {
     if (cartCount === 0) {
-        alert('Keranjang Anda masih kosong!');
+        showEmptyCartModal();
         return;
     }
     
-    // For now, show cart summary
-    let cartSummary = 'Keranjang Belanja:\n\n';
+    showCheckoutModal();
+}
+
+function showEmptyCartModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-icon empty-cart">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <h3>Keranjang Kosong</h3>
+            <p>Belum ada produk di keranjang Anda. Silakan pilih produk terlebih dahulu.</p>
+            <button class="modal-btn primary" onclick="closeModal()">Mengerti</button>
+        </div>
+    `;
+    
+    addModalStyles();
+    document.body.appendChild(modal);
+    
+    // Show modal with animation
+    requestAnimationFrame(() => {
+        modal.style.opacity = '1';
+        modal.querySelector('.modal-content').style.transform = 'scale(1)';
+    });
+}
+
+function showCheckoutModal() {
+    let cartSummary = '';
     let total = 0;
     
     cartItems.forEach(item => {
         const itemTotal = item.price * item.quantity;
-        cartSummary += `${item.name}\n`;
-        cartSummary += `${item.quantity}x - Rp${itemTotal.toLocaleString()}\n\n`;
+        cartSummary += `
+            <div class="cart-item">
+                <span class="item-name">${item.name}</span>
+                <span class="item-quantity">${item.quantity}x</span>
+                <span class="item-price">Rp${itemTotal.toLocaleString()}</span>
+            </div>
+        `;
         total += itemTotal;
     });
     
-    cartSummary += `Total: Rp${total.toLocaleString()}`;
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content checkout-modal">
+            <div class="modal-header">
+                <h3>Keranjang Belanja</h3>
+                <button class="close-btn" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="cart-items">
+                ${cartSummary}
+            </div>
+            <div class="cart-total">
+                <strong>Total: Rp${total.toLocaleString()}</strong>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="closeModal()">Batal</button>
+                <button class="modal-btn primary" onclick="proceedCheckout()">Lanjut Checkout</button>
+            </div>
+        </div>
+    `;
     
-    if (confirm(cartSummary + '\n\nLanjut ke checkout?')) {
-        // Implement checkout logic here
-        alert('Fitur checkout akan segera hadir!');
+    addModalStyles();
+    document.body.appendChild(modal);
+    
+    // Show modal with animation
+    requestAnimationFrame(() => {
+        modal.style.opacity = '1';
+        modal.querySelector('.modal-content').style.transform = 'scale(1)';
+    });
+}
+
+function addModalStyles() {
+    if (document.getElementById('modal-styles')) return;
+    
+    const styles = document.createElement('style');
+    styles.id = 'modal-styles';
+    styles.textContent = `
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            color: #111827;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .close-btn:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .modal-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 24px;
+        }
+        
+        .modal-icon.empty-cart {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .modal-content h3 {
+            margin: 0 0 8px 0;
+            color: #111827;
+            font-weight: 600;
+        }
+        
+        .modal-content p {
+            color: #6b7280;
+            margin: 0 0 20px 0;
+            line-height: 1.5;
+        }
+        
+        .cart-items {
+            text-align: left;
+            margin-bottom: 16px;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-name {
+            flex: 1;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .item-quantity {
+            color: #6b7280;
+            margin: 0 12px;
+        }
+        
+        .item-price {
+            font-weight: 600;
+            color: #111827;
+        }
+        
+        .cart-total {
+            text-align: center;
+            padding: 16px 0;
+            border-top: 2px solid #e5e7eb;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #111827;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        
+        .modal-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-size: 14px;
+        }
+        
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .modal-btn.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .modal-btn.secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        
+        .modal-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+    `;
+    document.head.appendChild(styles);
+}
+
+function closeModal() {
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) {
+        modal.style.opacity = '0';
+        modal.querySelector('.modal-content').style.transform = 'scale(0.9)';
+        setTimeout(() => {
+            modal.remove();
+        }, 300);
     }
+}
+
+function proceedCheckout() {
+    closeModal();
+    setTimeout(() => {
+        showCartNotification('Fitur checkout akan segera hadir!');
+    }, 300);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
