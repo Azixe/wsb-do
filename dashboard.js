@@ -1,6 +1,7 @@
 // Cart Management
 let cartItems = [];
 let cartCount = 0;
+let productQuantities = {}; // Track quantities for each product
 
 function updateCartBadge() {
     const cartBadge = document.getElementById('cartBadge');
@@ -13,10 +14,18 @@ function updateCartBadge() {
 }
 
 function addToCart(product) {
-    const existingItem = cartItems.find(item => item.name === product.name);
+    const productName = product.name;
     
+    // Update product quantities
+    if (!productQuantities[productName]) {
+        productQuantities[productName] = 0;
+    }
+    productQuantities[productName]++;
+    
+    // Update cart items
+    const existingItem = cartItems.find(item => item.name === productName);
     if (existingItem) {
-        existingItem.quantity += 1;
+        existingItem.quantity++;
     } else {
         cartItems.push({
             ...product,
@@ -26,9 +35,121 @@ function addToCart(product) {
     
     cartCount++;
     updateCartBadge();
+    updateProductButton(productName);
     
     // Show success feedback
     showCartNotification(`${product.name} ditambahkan ke keranjang!`);
+}
+
+function removeFromCart(productName) {
+    if (!productQuantities[productName] || productQuantities[productName] <= 0) {
+        return;
+    }
+    
+    productQuantities[productName]--;
+    cartCount--;
+    
+    // Update cart items
+    const existingItem = cartItems.find(item => item.name === productName);
+    if (existingItem) {
+        if (existingItem.quantity > 1) {
+            existingItem.quantity--;
+        } else {
+            // Remove item from cart
+            const index = cartItems.findIndex(item => item.name === productName);
+            cartItems.splice(index, 1);
+        }
+    }
+    
+    // If quantity reaches 0, remove from productQuantities
+    if (productQuantities[productName] === 0) {
+        delete productQuantities[productName];
+    }
+    
+    updateCartBadge();
+    updateProductButton(productName);
+}
+
+function updateProductButton(productName) {
+    // Find the product card
+    const productCards = document.querySelectorAll('.product-card');
+    productCards.forEach(card => {
+        const productTitle = card.querySelector('h3').textContent;
+        if (productTitle === productName) {
+            const buttonContainer = card.querySelector('.product-content');
+            const quantity = productQuantities[productName] || 0;
+            
+            // Remove existing button/counter
+            const existingButton = buttonContainer.querySelector('button');
+            const existingCounter = buttonContainer.querySelector('.quantity-counter');
+            
+            if (existingButton) existingButton.remove();
+            if (existingCounter) existingCounter.remove();
+            
+            if (quantity > 0) {
+                // Show quantity counter
+                const counter = document.createElement('div');
+                counter.className = 'quantity-counter';
+                counter.innerHTML = `
+                    <button class="quantity-btn" onclick="removeFromCart('${productName}')">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <span class="quantity-display">${quantity}</span>
+                    <button class="quantity-btn" onclick="addToCartFromCounter('${productName}')">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                `;
+                buttonContainer.appendChild(counter);
+            } else {
+                // Show add button
+                const button = document.createElement('button');
+                button.onclick = () => addToCart({
+                    name: productName,
+                    price: getProductPrice(productName),
+                    image: getProductImage(productName)
+                });
+                button.textContent = 'Tambah';
+                buttonContainer.appendChild(button);
+            }
+        }
+    });
+}
+
+function addToCartFromCounter(productName) {
+    const product = {
+        name: productName,
+        price: getProductPrice(productName),
+        image: getProductImage(productName)
+    };
+    addToCart(product);
+}
+
+function getProductPrice(productName) {
+    const products = [
+        { name: 'Beras Raja Platinum 5kg', price: 74500 },
+        { name: 'Le Minerale Galon 15L', price: 16000 },
+        { name: 'Minyak Tropical 2L', price: 33300 },
+        { name: 'Indomie Goreng 84g', price: 3300 },
+        { name: 'You C1000 Orange 140ml', price: 6399 },
+        { name: 'Sabun Lifebuoy 85g', price: 2900 }
+    ];
+    
+    const product = products.find(p => p.name === productName);
+    return product ? product.price : 0;
+}
+
+function getProductImage(productName) {
+    const products = [
+        { name: 'Beras Raja Platinum 5kg', image: 'imgs/beras.jpg' },
+        { name: 'Le Minerale Galon 15L', image: 'imgs/air.jpg' },
+        { name: 'Minyak Tropical 2L', image: 'imgs/minyak.jpg' },
+        { name: 'Indomie Goreng 84g', image: 'imgs/indomie.jpg' },
+        { name: 'You C1000 Orange 140ml', image: 'imgs/c1000.jpg' },
+        { name: 'Sabun Lifebuoy 85g', image: 'imgs/sabun.jpg' }
+    ];
+    
+    const product = products.find(p => p.name === productName);
+    return product ? product.image : '';
 }
 
 function showCartNotification(message) {
@@ -421,13 +542,41 @@ document.addEventListener('DOMContentLoaded', () => {
         productList.forEach(p => {
             const card = document.createElement('div');
             card.className = 'product-card';
+            
+            const quantity = productQuantities[p.name] || 0;
+            let buttonHtml;
+            
+            if (quantity > 0) {
+                buttonHtml = `
+                    <div class="quantity-counter">
+                        <button class="quantity-btn" onclick="removeFromCart('${p.name}')">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <span class="quantity-display">${quantity}</span>
+                        <button class="quantity-btn" onclick="addToCartFromCounter('${p.name}')">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                `;
+            } else {
+                buttonHtml = `<button onclick="addToCart({name: '${p.name}', price: ${p.price}, image: '${p.image}'})">Tambah</button>`;
+            }
+            
             card.innerHTML = `
                 ${p.discount ? `<div class="discount">${p.discount}%</div>` : ''}
-                <img src="${p.image}" alt="${p.name}">
-                <h3>${p.name}</h3>
-                ${p.originalPrice ? `<p class="old-price">Rp${p.originalPrice.toLocaleString()}</p>` : ''}
-                <p class="price">Rp${p.price.toLocaleString()}</p>
-                <button onclick="addToCart({name: '${p.name}', price: ${p.price}, image: '${p.image}'})">Tambah</button>
+                <div class="product-image-container">
+                    <img src="${p.image}" alt="${p.name}">
+                </div>
+                <div class="product-content">
+                    <div class="product-info">
+                        <h3>${p.name}</h3>
+                        <div class="price-container">
+                            ${p.originalPrice ? `<p class="old-price">Rp${p.originalPrice.toLocaleString()}</p>` : ''}
+                            <p class="price">Rp${p.price.toLocaleString()}</p>
+                        </div>
+                    </div>
+                    ${buttonHtml}
+                </div>
             `;
             productGrid.appendChild(card);
         });
