@@ -33,6 +33,57 @@ body {
 
 .user-actions {
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Cart Icon */
+.cart-icon {
+    position: relative;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-icon:hover {
+    background-color: #f8f9fa;
+}
+
+.cart-icon i {
+    font-size: 20px;
+    color: #667eea;
+    transition: color 0.3s ease;
+}
+
+.cart-icon:hover i {
+    color: #5a6fd8;
+}
+
+.cart-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #dc2626;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    padding: 0 2px;
+}
+
+.cart-badge.hidden {
+    display: none;
 }
 
 /* User Profile Dropdown */
@@ -278,6 +329,26 @@ body {
     
     .logo h1 {
         font-size: 1.2rem;
+    }
+    
+    .user-actions {
+        gap: 10px;
+    }
+    
+    .cart-icon {
+        padding: 8px;
+    }
+    
+    .cart-icon i {
+        font-size: 18px;
+    }
+    
+    .cart-badge {
+        width: 16px;
+        height: 16px;
+        font-size: 10px;
+        top: 3px;
+        right: 3px;
     }
     
     .user-name {
