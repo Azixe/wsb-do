@@ -10,115 +10,119 @@
 </head>
 
 <body class="login-page">
-    <div class="login-container" id="loginContainer">
-        <div class="login-card">
-            <div class="login-header">
-                <div class="logo">
-                    <img src="imgs\LOGO_WSB_blue.png" alt="WSB Logo" class="logo-img">
+    <main>
+        <div class="login-container" id="loginContainer">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="logo">
+                        <img src="imgs/LOGO_WSB_blue.png" alt="WSB Logo" class="logo-img">
+                    </div>
+                    <p>Sistem Delivery Order WSB</p>
                 </div>
-                <p>Sistem Delivery Order WSB</p>
+
+                <form class="login-form" id="loginForm">
+                    <div class="error-message" id="loginError"></div>
+
+                    <div class="form-group">
+                        <label for="username">
+                            <i class="fas fa-user"></i>
+                            No HP
+                        </label>
+                        <input type="tel" id="username" name="username" placeholder="Masukkan no handphone" required
+                            autocomplete="username">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i>
+                            Kata Sandi
+                        </label>
+                        <div class="password-wrapper">
+                            <input type="password" id="password" name="password" placeholder="Masukkan kata sandi"
+                                required autocomplete="current-password">
+                            <span class="password-toggle" onclick="togglePassword()">
+                                <i class="fas fa-eye" id="passwordIcon"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="rememberMe">
+                            <span class="checkmark"></span>
+                            Ingat saya
+                        </label>
+                        <a href="#" class="forgot-password-link" id="forgotPasswordLink">Lupa Kata Sandi?</a>
+                    </div>
+
+                    <button type="submit" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Masuk
+                    </button>
+                </form>
             </div>
-
-            <form class="login-form" id="loginForm">
-                <div class="error-message" id="loginError"></div>
-                
-                <div class="form-group">
-                    <label for="username">
-                        <i class="fas fa-user"></i>
-                        No HP
-                    </label>
-                    <input type="text" id="username" name="username" placeholder="Masukkan no handphone" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">
-                        <i class="fas fa-lock"></i>
-                        Kata Sandi
-                    </label>
-                    <div class="password-wrapper">
-                        <input type="password" id="password" name="password" placeholder="Masukkan kata sandi" required>
-                        <span class="password-toggle" onclick="togglePassword()">
-                            <i class="fas fa-eye" id="passwordIcon"></i>
-                        </span>
-                    </div>
-                </div>
-
-                <div class="form-options">
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="rememberMe">
-                        <span class="checkmark"></span>
-                        Ingat saya
-                    </label>
-                    <a href="#" class="forgot-password-link" id="forgotPasswordLink">Lupa Kata Sandi?</a>
-                </div>
-
-                <button type="submit" class="login-btn">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Masuk
-                </button>
-            </form>
         </div>
-    </div>
 
-    <div class="login-container hidden" id="forgotPasswordContainer">
-        <div class="login-card">
-            <div class="login-header">
-                <h3>Atur Ulang Kata Sandi</h3>
-                <p>Masukkan No. HP terdaftar dan atur kata sandi baru Anda.</p>
+        <div class="login-container hidden" id="forgotPasswordContainer">
+            <div class="login-card">
+                <div class="login-header">
+                    <h3>Atur Ulang Kata Sandi</h3>
+                    <p>Masukkan No. HP terdaftar dan atur kata sandi baru Anda.</p>
+                </div>
+
+                <form class="login-form" id="forgotPasswordForm">
+                    <div class="error-message" id="forgotPasswordError"></div>
+                    <div class="success-message" id="forgotPasswordSuccess"></div>
+
+                    <div class="form-group">
+                        <label for="resetPhoneNumber">
+                            <i class="fas fa-mobile-alt"></i>
+                            No. HP
+                        </label>
+                        <input type="tel" id="resetPhoneNumber" name="resetPhoneNumber"
+                            placeholder="Contoh: 08123456789" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="oldPassword">
+                            <i class="fas fa-lock"></i>
+                            Sandi Lama
+                        </label>
+                        <div class="password-wrapper">
+                            <input type="password" id="oldPassword" name="oldPassword" placeholder="Masukkan sandi lama"
+                                required autocomplete="current-password">
+                            <span class="password-toggle" onclick="toggleOldPassword()">
+                                <i class="fas fa-eye" id="oldPasswordIcon"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newPassword">
+                            <i class="fas fa-lock"></i>
+                            Sandi Baru
+                        </label>
+                        <div class="password-wrapper">
+                            <input type="password" id="newPassword" name="newPassword" placeholder="Masukkan sandi baru"
+                                required autocomplete="new-password">
+                            <span class="password-toggle" onclick="toggleNewPassword()">
+                                <i class="fas fa-eye" id="newPasswordIcon"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="login-btn">
+                        <i class="fas fa-save"></i>
+                        Simpan Kata Sandi Baru
+                    </button>
+
+                    <div class="form-options">
+                        <a href="#" class="forgot-password" id="backToLoginLink">Kembali ke Login</a>
+                    </div>
+                </form>
             </div>
-
-            <form class="login-form" id="forgotPasswordForm">
-                <div class="error-message" id="forgotPasswordError"></div>
-                <div class="success-message" id="forgotPasswordSuccess"></div>
-                
-                <div class="form-group">
-                    <label for="resetPhoneNumber">
-                        <i class="fas fa-mobile-alt"></i>
-                        No. HP
-                    </label>
-                    <input type="tel" id="resetPhoneNumber" name="resetPhoneNumber" placeholder="Contoh: 08123456789"
-                        required>
-                </div>
-
-                <div class="form-group">
-                    <label for="oldPassword">
-                        <i class="fas fa-lock"></i>
-                        Sandi Lama
-                    </label>
-                    <div class="password-wrapper">
-                        <input type="password" id="oldPassword" name="oldPassword" placeholder="Masukkan sandi lama"
-                            required>
-                        <span class="password-toggle" onclick="toggleOldPassword()">
-                            <i class="fas fa-eye" id="oldPasswordIcon"></i>
-                        </span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="newPassword">
-                        <i class="fas fa-lock"></i>
-                        Sandi Baru
-                    </label>
-                    <div class="password-wrapper">
-                        <input type="password" id="newPassword" name="newPassword" placeholder="Masukkan sandi baru"
-                            required>
-                        <span class="password-toggle" onclick="toggleNewPassword()">
-                            <i class="fas fa-eye" id="newPasswordIcon"></i>
-                        </span>
-                    </div>
-                </div>
-
-                <button type="submit" class="login-btn">
-                    <i class="fas fa-save"></i>
-                    Simpan Kata Sandi Baru
-                </button>
-
-                <div class="form-options">
-                    <a href="#" class="forgot-password" id="backToLoginLink">Kembali ke Login</a>
-                </div>
-            </form>
         </div>
-    </div>
+    </main>
 
     <script src="script.js"></script>
 </body>

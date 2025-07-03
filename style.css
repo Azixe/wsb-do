@@ -1,3 +1,20 @@
+/* Variabel CSS untuk manajemen tema yang mudah */
+:root {
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --text-dark: #333;
+    --text-light: #666;
+    --background-light: #f8f9fa;
+    --border-color: #e1e5e9;
+    --white: #fff;
+    --error-bg: #fee;
+    --error-text: #d8000c;
+    --error-border: #fcc;
+    --success-bg: #dff2bf;
+    --success-text: #4f8a10;
+    --success-border: #b3d4fc;
+}
+
 /* Reset and Base Styles */
 * {
     margin: 0;
@@ -8,14 +25,14 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
-    color: #333;
-    background-color: #f8f9fa;
+    color: var(--text-dark);
+    background-color: var(--background-light);
 }
 
 /* Login Page Styles */
 .login-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -27,7 +44,7 @@ body {
     grid-template-columns: 1fr;
     max-width: 500px;
     width: 100%;
-    background: white;
+    background: var(--white);
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -55,17 +72,17 @@ body {
 
 .logo i {
     font-size: 2.5rem;
-    color: #667eea;
+    color: var(--primary-color);
 }
 
 .logo h1 {
     font-size: 2rem;
     font-weight: 700;
-    color: #333;
+    color: var(--text-dark);
 }
 
 .login-header p {
-    color: #666;
+    color: var(--text-light);
     font-size: 1.1rem;
 }
 
@@ -85,28 +102,34 @@ body {
     gap: 10px;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #333;
+    color: var(--text-dark);
+    transition: color 0.3s ease;
 }
 
 .form-group label i {
-    color: #667eea;
+    color: var(--primary-color);
     width: 16px;
+}
+
+/* Style untuk label saat inputnya fokus */
+.form-group.focused label {
+    color: var(--primary-color);
 }
 
 .form-group input {
     width: 100%;
     padding: 15px 20px;
-    border: 2px solid #e1e5e9;
+    border: 2px solid var(--border-color);
     border-radius: 10px;
     font-size: 1rem;
     transition: all 0.3s ease;
-    background: #f8f9fa;
+    background: var(--background-light);
 }
 
 .form-group input:focus {
     outline: none;
-    border-color: #667eea;
-    background: white;
+    border-color: var(--primary-color);
+    background: var(--white);
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -115,34 +138,8 @@ body {
 }
 
 .password-wrapper input {
-    width: 100%;
-    padding: 15px 50px 15px 20px;
-    border: 2px solid #e1e5e9;
-    border-radius: 10px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: #f8f9fa;
-}
-
-.password-wrapper input:focus {
-    outline: none;
-    border-color: #667eea;
-    background: white;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.password-toggle {
-    position: absolute;
-    right: 15px;
-    top: 70%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #666;
-    transition: color 0.3s ease;
-}
-
-.password-toggle:hover {
-    color: #667eea;
+    padding-right: 50px;
+    /* Menambah padding untuk ikon mata */
 }
 
 .password-wrapper .password-toggle {
@@ -151,12 +148,12 @@ body {
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-    color: #666;
+    color: var(--text-light);
     transition: color 0.3s ease;
 }
 
 .password-wrapper .password-toggle:hover {
-    color: #667eea;
+    color: var(--primary-color);
 }
 
 .form-options {
@@ -180,15 +177,15 @@ body {
 .checkmark {
     width: 20px;
     height: 20px;
-    border: 2px solid #e1e5e9;
+    border: 2px solid var(--border-color);
     border-radius: 4px;
     position: relative;
     transition: all 0.3s ease;
 }
 
 .checkbox-container input[type="checkbox"]:checked+.checkmark {
-    background: #667eea;
-    border-color: #667eea;
+    background: var(--primary-color);
+    border-color: var(--primary-color);
 }
 
 .checkbox-container input[type="checkbox"]:checked+.checkmark::after {
@@ -197,26 +194,28 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: white;
+    color: var(--white);
     font-size: 12px;
     font-weight: bold;
 }
 
-.forgot-password {
-    color: #667eea;
+.forgot-password,
+.forgot-password-link {
+    color: var(--primary-color);
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s ease;
 }
 
-.forgot-password:hover {
+.forgot-password:hover,
+.forgot-password-link:hover {
     color: #5a6fd8;
     text-decoration: underline;
 }
 
 .login-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: var(--white);
     border: none;
     padding: 15px 30px;
     border-radius: 10px;
@@ -229,13 +228,16 @@ body {
     justify-content: center;
     gap: 10px;
     margin-top: 10px;
+    position: relative;
+    /* Diperlukan untuk efek ripple */
+    overflow: hidden;
+    /* Diperlukan untuk efek ripple */
 }
 
 .login-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
 }
-
 
 .logo-img {
     height: 40px;
@@ -249,30 +251,13 @@ body {
     margin-top: -20px;
 }
 
-/* Responsive Design for Login */
-@media (max-width: 768px) {
-    .login-card {
-        padding: 40px 30px;
-    }
-}
-
-@media (max-width: 480px) {
-    .login-card {
-        padding: 30px 20px;
-    }
-}
-
-.hidden {
-    display: none;
-}
-
-/* Error Message Styles */
+/* Pesan Error & Sukses */
 .error-message {
-    background: #fee;
-    color: #d8000c;
+    background: var(--error-bg);
+    color: var(--error-text);
     padding: 12px 15px;
     border-radius: 8px;
-    border: 1px solid #fcc;
+    border: 1px solid var(--error-border);
     margin-bottom: 20px;
     font-size: 14px;
     display: none;
@@ -283,11 +268,11 @@ body {
 }
 
 .success-message {
-    background: #dff2bf;
-    color: #4f8a10;
+    background: var(--success-bg);
+    color: var(--success-text);
     padding: 12px 15px;
     border-radius: 8px;
-    border: 1px solid #b3d4fc;
+    border: 1px solid var(--success-border);
     margin-bottom: 20px;
     font-size: 14px;
     display: none;
@@ -297,7 +282,11 @@ body {
     display: block;
 }
 
-/* Animation Classes */
+/* Kelas Utilitas & Animasi */
+.hidden {
+    display: none !important;
+}
+
 .fade-in {
     animation: fadeIn 0.6s ease-in-out;
 }
@@ -307,6 +296,7 @@ body {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -314,7 +304,37 @@ body {
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    75% { transform: translateX(10px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-10px);
+    }
+
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-card {
+        padding: 40px 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-card {
+        padding: 30px 20px;
+    }
 }

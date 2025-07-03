@@ -1,0 +1,221 @@
+/* Container utama halaman keranjang */
+.cart-page-container {
+    max-width: 1200px;
+    margin: 32px auto;
+    padding: 0 32px;
+}
+
+/* STYLE UNTUK LINK LANJUTKAN BELANJA DITAMBAHKAN DI SINI */
+.continue-shopping-link {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 12px 24px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.continue-shopping-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.continue-shopping-link i {
+    margin-right: 8px;
+}
+
+.cart-page-container h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: #111827;
+}
+
+/* Layout 2 kolom untuk item dan ringkasan */
+.cart-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 32px;
+    align-items: flex-start;
+}
+
+/* Kolom Kiri: Daftar item di keranjang */
+.cart-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cart-item-card {
+    display: flex;
+    gap: 16px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    align-items: center;
+}
+
+.cart-item-image {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.cart-item-info {
+    flex-grow: 1;
+}
+
+.cart-item-info h3 {
+    margin: 0 0 4px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.cart-item-info .price {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.cart-item-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.item-total-price {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.remove-item-btn {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.remove-item-btn:hover {
+    text-decoration: underline;
+}
+
+/* Kolom Kanan: Ringkasan Pesanan */
+.order-summary {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+    position: sticky;
+    top: 120px;
+    /* Jarak dari atas setelah navbar */
+}
+
+.order-summary h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+    color: #111827;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 1rem;
+}
+
+.summary-row span:first-child {
+    color: #6b7280;
+}
+
+.summary-row span:last-child {
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.order-summary hr {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 20px 0;
+}
+
+.summary-row.total {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.summary-row.total span {
+    color: #111827;
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.checkout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Style untuk pesan keranjang kosong */
+.empty-cart-message {
+    text-align: center;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.empty-cart-message p {
+    margin-bottom: 20px;
+    color: #6b7280;
+}
+
+.empty-cart-message .back-to-shop-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .cart-layout {
+        grid-template-columns: 1fr;
+        /* Kolom menjadi 1 di tablet */
+    }
+}
+
+@media (max-width: 768px) {
+    .cart-page-container {
+        padding: 0 20px;
+        margin: 24px auto;
+    }
+
+    .cart-item-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cart-item-actions {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
