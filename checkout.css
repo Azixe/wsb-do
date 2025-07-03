@@ -19,8 +19,8 @@
 }
 
 .back-to-cart-link:hover {
-    color: #5a6fd8;
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .checkout-page-container h1 {
@@ -35,6 +35,11 @@
     grid-template-columns: 1.5fr 1fr;
     gap: 32px;
     align-items: flex-start;
+}
+
+.logo-link {
+    text-decoration: none;
+    color: inherit;
 }
 
 /* Form Styling */
