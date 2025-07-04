@@ -25,6 +25,11 @@
     margin-right: 8px;
 }
 
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+}
+
 .cart-page-container h1 {
     font-size: 2rem;
     font-weight: 700;
