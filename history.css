@@ -29,6 +29,7 @@
 .logo-img {
     height: 36px;
     width: auto;
+    margin-top: -20px;
 }
 
 .logo-link {
@@ -301,7 +302,7 @@
 }
 
 .no-history-message .back-to-shop-btn {
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
     padding: 12px 24px;
     text-decoration: none;

@@ -77,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="cart-item-actions">
                         <span class="item-total-price">Rp${itemTotalPrice.toLocaleString('id-ID')}</span>
-                        <button class="remove-item-btn" data-action="remove">Hapus</button>
                     </div>
                 `;
                 cartItemsList.appendChild(itemCard);
