@@ -31,6 +31,11 @@
     width: auto;
 }
 
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+}
+
 .user-actions {
     display: flex;
     align-items: center;

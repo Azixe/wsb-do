@@ -139,7 +139,6 @@ body {
 
 .password-wrapper input {
     padding-right: 50px;
-    /* Menambah padding untuk ikon mata */
 }
 
 .password-wrapper .password-toggle {
@@ -199,19 +198,7 @@ body {
     font-weight: bold;
 }
 
-.forgot-password,
-.forgot-password-link {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
-}
-
-.forgot-password:hover,
-.forgot-password-link:hover {
-    color: #5a6fd8;
-    text-decoration: underline;
-}
+/* Blok CSS untuk .forgot-password-link telah dihapus karena sudah tidak terpakai */
 
 .login-btn {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
@@ -229,9 +216,7 @@ body {
     gap: 10px;
     margin-top: 10px;
     position: relative;
-    /* Diperlukan untuk efek ripple */
     overflow: hidden;
-    /* Diperlukan untuk efek ripple */
 }
 
 .login-btn:hover {

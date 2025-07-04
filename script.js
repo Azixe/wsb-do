@@ -11,14 +11,12 @@ document.addEventListener('DOMContentLoaded', function () {
     inputs.forEach(input => {
         input.addEventListener('focus', function () {
             this.parentElement.classList.add('focused');
-            // Jika di dalam .password-wrapper, tambahkan 'focused' ke parent .form-group juga
             if (this.closest('.password-wrapper')) {
                 this.closest('.form-group').classList.add('focused');
             }
         });
 
         input.addEventListener('blur', function () {
-            // Hapus 'focused' jika input kosong
             if (!this.value) {
                 this.parentElement.classList.remove('focused');
                 if (this.closest('.password-wrapper')) {
@@ -43,35 +41,12 @@ document.addEventListener('DOMContentLoaded', function () {
  */
 function initLoginPage() {
     const loginForm = document.getElementById('loginForm');
-    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
-    const loginContainer = document.getElementById('loginContainer');
-    const forgotPasswordContainer = document.getElementById('forgotPasswordContainer');
-    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-    const backToLoginLink = document.getElementById('backToLoginLink');
 
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
     }
 
-    if (forgotPasswordForm) {
-        forgotPasswordForm.addEventListener('submit', handleForgotPassword);
-    }
-
-    if (forgotPasswordLink) {
-        forgotPasswordLink.addEventListener('click', function (event) {
-            event.preventDefault();
-            loginContainer.classList.add('hidden');
-            forgotPasswordContainer.classList.remove('hidden');
-        });
-    }
-
-    if (backToLoginLink) {
-        backToLoginLink.addEventListener('click', function (event) {
-            event.preventDefault();
-            forgotPasswordContainer.classList.add('hidden');
-            loginContainer.classList.remove('hidden');
-        });
-    }
+    // Logika untuk Lupa Kata Sandi dihapus dari sini
 
     const loginCard = document.querySelector('.login-card');
     if (loginCard) {
@@ -88,10 +63,9 @@ function initLoginPage() {
 function handleLogin(e) {
     e.preventDefault();
 
-    // 1. Validasi input dari sisi klien terlebih dahulu
     if (!validateForm()) {
         shakeCard();
-        return; // Hentikan proses jika form tidak valid
+        return;
     }
 
     const username = document.getElementById('username').value;
@@ -101,69 +75,20 @@ function handleLogin(e) {
     hideMessage('loginError');
     setLoadingState(loginBtn, true);
 
-    // 🚨 PERINGATAN KEAMANAN: Bagian ini hanya untuk demonstrasi!
-    // Di aplikasi nyata, Anda HARUS mengirim data ini ke server (backend)
-    // menggunakan fetch() dan memvalidasinya di sana.
-    // JANGAN PERNAH menyimpan kredensial di kode frontend.
     setTimeout(() => {
         if (username === 'admin' && password === 'admin123') {
-            // 🚨 PERINGATAN KEAMANAN: localStorage tidak aman untuk token sesi
-            // karena rentan terhadap serangan XSS. Di aplikasi nyata,
-            // gunakan HttpOnly cookie yang diatur oleh server.
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('username', username);
-
-            // Arahkan ke dashboard setelah berhasil
             window.location.href = 'dashboard.html';
         } else {
             showMessage('loginError', 'No HP atau Kata Sandi salah!');
-            setLoadingState(loginBtn, false); // Kembalikan tombol ke keadaan semula
-            shakeCard(); // Beri efek gemetar untuk menandakan error
+            setLoadingState(loginBtn, false);
+            shakeCard();
         }
-    }, 1500); // Simulasi waktu tunggu respons server
-}
-
-/**
- * Menangani proses submit form lupa kata sandi.
- * @param {Event} e - Event object dari form submission.
- */
-function handleForgotPassword(e) {
-    e.preventDefault();
-
-    const phoneNumber = document.getElementById('resetPhoneNumber').value;
-    const oldPassword = document.getElementById('oldPassword').value;
-    const newPassword = document.getElementById('newPassword').value;
-    const submitBtn = document.querySelector('#forgotPasswordForm .login-btn');
-
-    hideMessage('forgotPasswordError');
-    hideMessage('forgotPasswordSuccess');
-
-    if (oldPassword === newPassword) {
-        showMessage('forgotPasswordError', 'Password baru harus berbeda dari password lama!');
-        return;
-    }
-    if (newPassword.length < 6) {
-        showMessage('forgotPasswordError', 'Password baru minimal 6 karakter!');
-        return;
-    }
-
-    setLoadingState(submitBtn, true, "Menyimpan...");
-
-    // Simulasi proses reset password di server
-    setTimeout(() => {
-        showMessage('forgotPasswordSuccess', `Kata sandi untuk No. HP ${phoneNumber} telah berhasil diubah!`);
-        setLoadingState(submitBtn, false, "Simpan Kata Sandi Baru");
-
-        // Kembali ke halaman login setelah beberapa saat
-        setTimeout(() => {
-            document.getElementById('backToLoginLink').click();
-            e.target.reset(); // Kosongkan form setelah berhasil
-            hideMessage('forgotPasswordError');
-            hideMessage('forgotPasswordSuccess');
-        }, 2000);
-
     }, 1500);
 }
+
+// --- FUNGSI handleForgotPassword, toggleOldPassword, dan toggleNewPassword telah dihapus ---
 
 
 // --- FUNGSI TOGGLE & UI ---
@@ -172,18 +97,8 @@ function togglePassword() {
     togglePasswordVisibility('password', 'passwordIcon');
 }
 
-function toggleOldPassword() {
-    togglePasswordVisibility('oldPassword', 'oldPasswordIcon');
-}
-
-function toggleNewPassword() {
-    togglePasswordVisibility('newPassword', 'newPasswordIcon');
-}
-
 /**
  * Fungsi umum untuk mengubah visibilitas password.
- * @param {string} inputId - ID dari elemen input password.
- * @param {string} iconId - ID dari elemen ikon mata.
  */
 function togglePasswordVisibility(inputId, iconId) {
     const passwordInput = document.getElementById(inputId);
@@ -199,8 +114,6 @@ function togglePasswordVisibility(inputId, iconId) {
 
 /**
  * Menampilkan pesan pada elemen tertentu.
- * @param {string} elementId - ID dari elemen pesan.
- * @param {string} message - Teks pesan yang akan ditampilkan.
  */
 function showMessage(elementId, message) {
     const messageElement = document.getElementById(elementId);
@@ -212,7 +125,6 @@ function showMessage(elementId, message) {
 
 /**
  * Menyembunyikan elemen pesan.
- * @param {string} elementId - ID dari elemen pesan.
  */
 function hideMessage(elementId) {
     const messageElement = document.getElementById(elementId);
@@ -236,9 +148,6 @@ function shakeCard() {
 
 /**
  * Mengatur status loading pada tombol.
- * @param {HTMLElement} button - Elemen tombol.
- * @param {boolean} isLoading - Apakah status loading aktif.
- * @param {string} [text="Masuk"] - Teks default tombol.
  */
 function setLoadingState(button, isLoading, text = "Masuk") {
     if (isLoading) {
@@ -252,8 +161,6 @@ function setLoadingState(button, isLoading, text = "Masuk") {
 
 /**
  * Membuat efek ripple pada elemen yang diklik.
- * @param {Event} event - Event object.
- * @param {HTMLElement} element - Elemen yang akan diberi efek.
  */
 function createRipple(event, element) {
     const ripple = document.createElement('span');
@@ -278,11 +185,6 @@ function createRipple(event, element) {
 
 
 // --- FUNGSI VALIDASI ---
-
-/**
- * Memvalidasi form login utama.
- * @returns {boolean} - True jika valid, false jika tidak.
- */
 function validateForm() {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan Akun</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="setting.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script defer src="setting.js"></script>
+</head>
+
+<body>
+    <header class="navbar">
+        <a href="dashboard.html" class="logo-link">
+            <div class="logo">
+                <img src="imgs/LOGO_WSB_blue.png" alt="WSB Logo" class="logo-img">
+                <h1>Delivery</h1>
+            </div>
+        </a>
+    </header>
+
+    <main class="settings-container">
+        <h1>Pengaturan Akun</h1>
+        <div class="settings-card">
+            <h2>Ganti Kata Sandi</h2>
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label for="oldPassword">Kata Sandi Lama</label>
+                    <input type="password" id="oldPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">Kata Sandi Baru</label>
+                    <input type="password" id="newPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Konfirmasi Kata Sandi Baru</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <button type="submit" class="save-btn">Simpan Perubahan</button>
+            </form>
+        </div>
+    </main>
+</body>
+
+</html>

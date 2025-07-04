@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Fitur Profil Saya akan segera hadir!');
                 break;
             case 'showSettings':
-                alert('Fitur Pengaturan akan segera hadir!');
+                window.location.href = 'setting.html';
                 break;
             case 'logout':
                 if (confirm('Apakah Anda yakin ingin keluar?')) {
