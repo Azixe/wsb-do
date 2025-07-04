@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Pesanan</title>
+    <link rel="stylesheet" href="history.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script defer src="history.js"></script>
+</head>
+
+<body>
+    <header class="navbar">
+        <a href="dashboard.html" class="logo-link">
+            <div class="logo">
+                <img src="imgs/LOGO_WSB_blue.png" alt="WSB Logo" class="logo-img">
+                <h1>Delivery</h1>
+            </div>
+        </a>
+        <div class="user-actions">
+            <div class="cart-icon" id="cartIcon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge hidden" id="cartBadge">0</span>
+            </div>
+            <div class="user-profile" id="userProfile">
+                <div class="user-avatar"><i class="fas fa-user"></i></div>
+                <span class="user-name" id="userName">Admin</span>
+                <i class="fas fa-chevron-down dropdown-arrow"></i>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <div class="dropdown-item" data-action="showProfile"><i class="fas fa-user"></i><span>Profil
+                            Saya</span></div>
+                    <a href="history.html" class="dropdown-item"><i class="fas fa-history"></i><span>Riwayat
+                            Pesanan</span></a>
+                    <div class="dropdown-item" data-action="showSettings"><i
+                            class="fas fa-cog"></i><span>Pengaturan</span></div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item logout" data-action="logout"><i
+                            class="fas fa-sign-out-alt"></i><span>Logout</span></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="history-page-container">
+        <h1>Riwayat Pesanan Anda</h1>
+        <div class="order-list" id="orderList">
+        </div>
+    </main>
+</body>
+
+</html>
