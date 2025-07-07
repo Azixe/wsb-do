@@ -60,7 +60,8 @@ function initLoginPage() {
  * Menangani proses submit form login.
  * @param {Event} e - Event object dari form submission.
  */
-function handleLogin(e) {
+// Ganti fungsi handleLogin yang lama dengan yang ini
+async function handleLogin(e) {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -75,17 +76,38 @@ function handleLogin(e) {
     hideMessage('loginError');
     setLoadingState(loginBtn, true);
 
-    setTimeout(() => {
-        if (username === 'admin' && password === 'admin123') {
+    // Kirim data ke backend menggunakan fetch()
+    try {
+        const response = await fetch('http://localhost:3001/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password }), // Kirim username dan password sebagai JSON
+        });
+
+        const data = await response.json(); // Baca respons dari server
+
+        if (response.ok) { // Jika server merespons dengan status sukses (2xx)
+            // Login berhasil
             localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('username', username);
+            // Kita bisa simpan nama pengguna yang dikembalikan dari server
+            localStorage.setItem('username', data.user.nama);
             window.location.href = 'pages/dashboard.html';
         } else {
-            showMessage('loginError', 'No HP atau Kata Sandi salah!');
+            // Jika server merespons dengan error (4xx atau 5xx)
+            showMessage('loginError', data.message);
             setLoadingState(loginBtn, false);
             shakeCard();
         }
-    }, 1500);
+
+    } catch (error) {
+        // Jika terjadi error jaringan (misal: server backend tidak jalan)
+        console.error('Fetch error:', error);
+        showMessage('loginError', 'Tidak bisa terhubung ke server. Coba lagi nanti.');
+        setLoadingState(loginBtn, false);
+        shakeCard();
+    }
 }
 
 // --- FUNGSI handleForgotPassword, toggleOldPassword, dan toggleNewPassword telah dihapus ---
