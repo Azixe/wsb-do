@@ -79,7 +79,7 @@ function handleLogin(e) {
         if (username === 'admin' && password === 'admin123') {
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('username', username);
-            window.location.href = 'dashboard.html';
+            window.location.href = 'pages/dashboard.html';
         } else {
             showMessage('loginError', 'No HP atau Kata Sandi salah!');
             setLoadingState(loginBtn, false);

@@ -5,12 +5,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 🚨 Di aplikasi nyata, data ini akan diambil dari server menggunakan `fetch()`
     const allProducts = [
-        { id: 'prod001', name: 'Beras Raja Platinum 5kg', price: 74500, category: 'sembako', image: 'imgs/beras.jpg' },
-        { id: 'prod002', name: 'Le Minerale Galon 15L', price: 16000, originalPrice: 21500, discount: 26, category: 'minuman', image: 'imgs/air.jpg' },
-        { id: 'prod003', name: 'Minyak Tropical 2L', price: 33300, originalPrice: 41300, discount: 19, category: 'sembako', image: 'imgs/minyak.jpg' },
-        { id: 'prod004', name: 'Indomie Goreng 84g', price: 3300, category: 'makanan', image: 'imgs/indomie.jpg' },
-        { id: 'prod005', name: 'You C1000 Orange 140ml', price: 6399, originalPrice: 7900, discount: 19, category: 'minuman', image: 'imgs/c1000.jpg' },
-        { id: 'prod006', name: 'Sabun Lifebuoy 85g', price: 2900, category: 'kebersihan', image: 'imgs/sabun.jpg' }
+        { id: 'prod001', name: 'Beras Raja Platinum 5kg', price: 74500, category: 'sembako', image: '../assets/imgs/beras.jpg' },
+        { id: 'prod002', name: 'Le Minerale Galon 15L', price: 16000, originalPrice: 21500, discount: 26, category: 'minuman', image: '../assets/imgs/air.jpg' },
+        { id: 'prod003', name: 'Minyak Tropical 2L', price: 33300, originalPrice: 41300, discount: 19, category: 'sembako', image: '../assets/imgs/minyak.jpg' },
+        { id: 'prod004', name: 'Indomie Goreng 84g', price: 3300, category: 'makanan', image: '../assets/imgs/indomie.jpg' },
+        { id: 'prod005', name: 'You C1000 Orange 140ml', price: 6399, originalPrice: 7900, discount: 19, category: 'minuman', image: '../assets/imgs/c1000.jpg' },
+        { id: 'prod006', name: 'Sabun Lifebuoy 85g', price: 2900, category: 'kebersihan', image: '../assets/imgs/sabun.jpg' }
     ];
 
     // Coba ambil data keranjang dari localStorage, atau mulai dengan objek kosong
@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'logout':
                 if (confirm('Apakah Anda yakin ingin keluar?')) {
                     localStorage.clear();
-                    window.location.href = 'index.html';
+                    window.location.href = '../index.html';
                 }
                 break;
         }
@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initializeDashboard() {
         if (!localStorage.getItem('isLoggedIn')) {
-            window.location.href = 'index.html';
+            window.location.href = '../index.html';
             return;
         }
 
