@@ -1,233 +1,183 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // =================================================================================
-    // STATE & DATA (SINGLE SOURCE OF TRUTH)
-    // =================================================================================
-
-    // 🚨 Di aplikasi nyata, data ini akan diambil dari server menggunakan `fetch()`
-    const allProducts = [
-        { id: 'prod001', name: 'Beras Raja Platinum 5kg', price: 74500, category: 'sembako', image: '../assets/imgs/beras.jpg' },
-        { id: 'prod002', name: 'Le Minerale Galon 15L', price: 16000, originalPrice: 21500, discount: 26, category: 'minuman', image: '../assets/imgs/air.jpg' },
-        { id: 'prod003', name: 'Minyak Tropical 2L', price: 33300, originalPrice: 41300, discount: 19, category: 'sembako', image: '../assets/imgs/minyak.jpg' },
-        { id: 'prod004', name: 'Indomie Goreng 84g', price: 3300, category: 'makanan', image: '../assets/imgs/indomie.jpg' },
-        { id: 'prod005', name: 'You C1000 Orange 140ml', price: 6399, originalPrice: 7900, discount: 19, category: 'minuman', image: '../assets/imgs/c1000.jpg' },
-        { id: 'prod006', name: 'Sabun Lifebuoy 85g', price: 2900, category: 'kebersihan', image: '../assets/imgs/sabun.jpg' }
-    ];
-
-    // Coba ambil data keranjang dari localStorage, atau mulai dengan objek kosong
+    // === STATE APLIKASI ===
+    let currentPage = 1;
+    let totalPages = 1;
+    let currentSearchTerm = '';
+    let currentCategory = 'semua';
+    let isLoading = false;
     let cart = JSON.parse(localStorage.getItem('wsbCart')) || {};
+    let productsOnPage = []; // Menyimpan data produk yang sedang tampil
 
-    // =================================================================================
-    // DOM ELEMENTS
-    // =================================================================================
-
+    // === DOM ELEMENTS ===
     const productGrid = document.getElementById('productGrid');
     const categoryList = document.getElementById('categoryList');
     const searchInput = document.getElementById('searchInput');
-    const cartBadge = document.getElementById('cartBadge');
     const userNameEl = document.getElementById('userName');
     const userProfile = document.getElementById('userProfile');
     const dropdownMenu = document.getElementById('dropdownMenu');
+    const cartBadge = document.getElementById('cartBadge');
 
-    // =================================================================================
-    // RENDER FUNCTIONS
-    // =================================================================================
+    // === FUNGSI-FUNGSI ===
 
-    /**
-     * Merender daftar produk ke dalam grid.
-     * @param {Array} productsToRender - Array produk yang akan ditampilkan.
-     */
-    function renderProducts(productsToRender) {
-        productGrid.innerHTML = '';
-        if (productsToRender.length === 0) {
-            productGrid.innerHTML = '<p>Produk tidak ditemukan.</p>';
+    // 1. Fungsi Render (Menampilkan ke layar)
+    function renderProducts(products, append = false) {
+        if (!append) {
+            productGrid.innerHTML = '';
+            productsOnPage = [];
+        }
+        if (!products || products.length === 0) {
+            if (!append) productGrid.innerHTML = '<p>Produk tidak ditemukan.</p>';
             return;
         }
 
-        productsToRender.forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            const quantity = cart[p.id] || 0;
-
-            let buttonHtml;
-            if (quantity > 0) {
-                buttonHtml = `
-                    <div class="quantity-counter" data-product-id="${p.id}">
-                        <button class="quantity-btn" data-action="decrease">-</button>
-                        <span class="quantity-display">${quantity}</span>
-                        <button class="quantity-btn" data-action="increase">+</button>
-                    </div>`;
-            } else {
-                buttonHtml = `<button class="add-to-cart-btn" data-action="add" data-product-id="${p.id}">Tambah</button>`;
+        products.forEach(p => {
+            if (!document.querySelector(`.product-card[data-product-id="${p.id}"]`)) {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.dataset.productId = p.id;
+                productGrid.appendChild(card);
+                productsOnPage.push(p); // Tambahkan ke data produk di halaman ini
+                updateCardUI(card, p);
             }
-
-            card.innerHTML = `
-                ${p.discount ? `<div class="discount">${p.discount}%</div>` : ''}
-                <div class="product-image-container">
-                    <img src="${p.image}" alt="${p.name}">
-                </div>
-                <div class="product-content">
-                    <div class="product-info">
-                        <h3>${p.name}</h3>
-                        <div class="price-container">
-                            ${p.originalPrice ? `<p class="old-price">Rp${p.originalPrice.toLocaleString('id-ID')}</p>` : ''}
-                            <p class="price">Rp${p.price.toLocaleString('id-ID')}</p>
-                        </div>
-                    </div>
-                    ${buttonHtml}
-                </div>`;
-            productGrid.appendChild(card);
         });
     }
 
-    /**
-     * Memperbarui tampilan badge keranjang.
-     */
-    function updateCartBadge() {
-        const totalItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
-        if (totalItems > 0) {
-            cartBadge.textContent = totalItems;
-            cartBadge.classList.remove('hidden');
-        } else {
-            cartBadge.classList.add('hidden');
+    function updateCardUI(cardElement, productData) {
+        const quantity = cart[productData.id]?.quantity || 0;
+        let buttonHtml = quantity > 0
+            ? `<div class="quantity-counter" data-product-id="${productData.id}"><button class="quantity-btn" data-action="decrease">-</button><span class="quantity-display">${quantity}</span><button class="quantity-btn" data-action="increase">+</button></div>`
+            : `<button class="add-to-cart-btn" data-action="add" data-product-id="${productData.id}">Tambah</button>`;
+
+        cardElement.innerHTML = `<div class="product-image-container"><img src="${productData.image || '../assets/imgs/placeholder.png'}" alt="${productData.name}"></div><div class="product-content"><div class="product-info"><h3>${productData.name}</h3><div class="price-container"><p class="price">Rp${(productData.price || 0).toLocaleString('id-ID')}</p></div></div><div class="action-container">${buttonHtml}</div></div>`;
+    }
+
+    function renderCategories(categories) {
+        categoryList.querySelectorAll('.category-btn:not([data-category="semua"])').forEach(btn => btn.remove());
+        categories.forEach(category => {
+            if (category) {
+                const button = document.createElement('button');
+                button.className = 'category-btn';
+                button.dataset.category = category.toLowerCase();
+                button.textContent = category;
+                categoryList.appendChild(button);
+            }
+        });
+    }
+
+    // 2. Fungsi Fetch Data (Komunikasi dengan Backend)
+    async function fetchProducts(isNewQuery = false) {
+        if (isLoading || (!isNewQuery && currentPage > totalPages)) return;
+
+        isLoading = true;
+        if (isNewQuery) {
+            currentPage = 1;
+            totalPages = 1;
+            productGrid.innerHTML = '<p>Memuat produk...</p>';
+        }
+
+        const url = `http://localhost:3001/api/products?search=${currentSearchTerm}&category=${currentCategory}&page=${currentPage}&limit=20`;
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            renderProducts(data.products, !isNewQuery);
+            totalPages = data.totalPages;
+            currentPage++;
+        } catch (error) {
+            console.error('Gagal mengambil produk:', error);
+            productGrid.innerHTML = '<p>Gagal memuat produk. Coba lagi.</p>';
+        } finally {
+            isLoading = false;
         }
     }
 
-    // =================================================================================
-    // CART LOGIC
-    // =================================================================================
+    async function fetchInitialData() {
+        try {
+            const [_, productsData] = await Promise.all([
+                fetch('http://localhost:3001/api/categories').then(res => res.json()).then(renderCategories),
+                fetch(`http://localhost:3001/api/products?page=1&limit=20`).then(res => res.json())
+            ]);
 
-    /**
-     * Menyimpan state keranjang saat ini ke localStorage.
-     */
-    function saveCartToStorage() {
-        localStorage.setItem('wsbCart', JSON.stringify(cart));
+            renderProducts(productsData.products);
+            totalPages = productsData.totalPages;
+            currentPage = 2;
+        } catch (error) {
+            console.error('Error memuat data awal:', error);
+            productGrid.innerHTML = '<p>Gagal memuat data.</p>';
+        }
     }
 
+    // 3. Fungsi Keranjang (Cart Logic)
+    function saveCartToStorage() { localStorage.setItem('wsbCart', JSON.stringify(cart)); }
+    function updateCartBadge() { const totalItems = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0); cartBadge.textContent = totalItems; cartBadge.classList.toggle('hidden', totalItems === 0); }
+
     function addToCart(productId) {
-        cart[productId] = (cart[productId] || 0) + 1;
-        const product = allProducts.find(p => p.id === productId);
-        showCartNotification(`${product.name} ditambahkan!`);
-        updateUI();
+        const product = productsOnPage.find(p => p.id === productId);
+        if (!product) return;
+        if (cart[productId]) {
+            cart[productId].quantity++;
+        } else {
+            cart[productId] = { quantity: 1, name: product.name, price: product.price, image: product.image, id: product.id };
+        }
+        updateAfterCartChange(productId);
     }
 
     function removeFromCart(productId) {
         if (cart[productId]) {
-            cart[productId]--;
-            if (cart[productId] === 0) {
-                delete cart[productId];
-            }
-            updateUI();
+            cart[productId].quantity--;
+            if (cart[productId].quantity === 0) delete cart[productId];
+            updateAfterCartChange(productId);
         }
     }
 
-    /**
-     * Memperbarui seluruh UI yang bergantung pada state dan menyimpan ke storage.
-     */
-    function updateUI() {
-        const currentCategory = categoryList.querySelector('.active').dataset.category;
-        const currentSearchTerm = searchInput.value;
-        filterAndRenderProducts(currentCategory, currentSearchTerm);
+    function updateAfterCartChange(productId) {
         updateCartBadge();
-        saveCartToStorage(); // <-- Perubahan penting: simpan setiap ada update
+        saveCartToStorage();
+        const cardToUpdate = document.querySelector(`.product-card[data-product-id="${productId}"]`);
+        if (cardToUpdate) {
+            const productData = productsOnPage.find(p => p.id === productId) || { id: productId };
+            updateCardUI(cardToUpdate, productData);
+        }
     }
 
-    // =================================================================================
-    // FILTER & SEARCH LOGIC
-    // =================================================================================
+    // === EVENT LISTENERS ===
 
-    function filterAndRenderProducts(category, searchTerm) {
-        let filteredProducts = allProducts;
-
-        // Filter by category
-        if (category !== 'semua') {
-            filteredProducts = filteredProducts.filter(p => p.category === category);
-        }
-
-        // Filter by search term
-        if (searchTerm) {
-            filteredProducts = filteredProducts.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
-        }
-
-        renderProducts(filteredProducts);
-    }
-
-    // =================================================================================
-    // EVENT LISTENERS (Centralized)
-    // =================================================================================
-
-    /**
-     * Event Delegation untuk semua aksi di dalam product grid.
-     */
-    productGrid.addEventListener('click', (e) => {
-        const action = e.target.dataset.action;
-        if (!action) return;
-
-        let productId;
-        if (e.target.dataset.productId) {
-            productId = e.target.dataset.productId;
-        } else if (e.target.closest('.quantity-counter')) {
-            productId = e.target.closest('.quantity-counter').dataset.productId;
-        }
-
-        if (!productId) return;
-
-        switch (action) {
-            case 'add':
-            case 'increase':
-                addToCart(productId);
-                break;
-            case 'decrease':
-                removeFromCart(productId);
-                break;
-        }
+    searchInput.addEventListener('input', () => {
+        currentSearchTerm = searchInput.value;
+        fetchProducts(true);
     });
 
     categoryList.addEventListener('click', (e) => {
         if (e.target.matches('.category-btn')) {
             categoryList.querySelector('.active').classList.remove('active');
             e.target.classList.add('active');
-            const selectedCategory = e.target.dataset.category;
-            filterAndRenderProducts(selectedCategory, searchInput.value);
+            currentCategory = e.target.dataset.category;
+            fetchProducts(true);
         }
     });
 
-    searchInput.addEventListener('input', () => {
-        const activeCategory = categoryList.querySelector('.active').dataset.category;
-        filterAndRenderProducts(activeCategory, searchInput.value);
+    window.addEventListener('scroll', () => {
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+            fetchProducts();
+        }
     });
 
-    // <-- Perubahan penting: Aksi klik ikon keranjang
-    document.getElementById('cartIcon').addEventListener('click', () => {
-        // Tidak lagi membuka modal, tapi pindah ke halaman keranjang
-        window.location.href = 'cart.html';
+    productGrid.addEventListener('click', (e) => {
+        const button = e.target.closest('button[data-action]');
+        if (!button) return;
+        const action = button.dataset.action;
+        const container = button.closest('[data-product-id]');
+        const productId = container.dataset.productId;
+        if (!productId) return;
+        if (action === 'add' || action === 'increase') addToCart(productId);
+        else if (action === 'decrease') removeFromCart(productId);
     });
+
+    document.getElementById('cartIcon').addEventListener('click', () => { window.location.href = 'cart.html'; });
 
     userProfile.addEventListener('click', (e) => {
         e.stopPropagation();
         userProfile.classList.toggle('active');
         dropdownMenu.classList.toggle('show');
-    });
-
-    dropdownMenu.addEventListener('click', (e) => {
-        const action = e.target.closest('.dropdown-item')?.dataset.action;
-        if (!action) return;
-
-        switch (action) {
-            case 'showProfile':
-                alert('Fitur Profil Saya akan segera hadir!');
-                break;
-            case 'showSettings':
-                window.location.href = 'setting.html';
-                break;
-            case 'logout':
-                if (confirm('Apakah Anda yakin ingin keluar?')) {
-                    localStorage.clear();
-                    window.location.href = '../index.html';
-                }
-                break;
-        }
-        userProfile.classList.remove('active');
-        dropdownMenu.classList.remove('show');
     });
 
     document.addEventListener('click', () => {
@@ -237,44 +187,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // =================================================================================
-    // UI COMPONENTS (Notifications)
-    // =================================================================================
+    dropdownMenu.addEventListener('click', (e) => {
+        const target = e.target.closest('.dropdown-item');
+        if (!target) return;
 
-    function showCartNotification(message) {
-        const existingNotification = document.querySelector('.cart-notification');
-        if (existingNotification) existingNotification.remove();
+        const href = target.href;
+        if (href && href.includes('.html')) {
+            return; // Biarkan link biasa berfungsi
+        }
 
-        const notification = document.createElement('div');
-        notification.className = 'cart-notification';
-        notification.innerHTML = `<i class="fas fa-check-circle"></i> <span>${message}</span>`;
-        document.body.appendChild(notification);
+        const action = target.dataset.action;
+        if (!action) return;
 
-        requestAnimationFrame(() => notification.classList.add('show'));
+        switch (action) {
+            case 'showProfile': alert('Fitur Profil akan segera hadir!'); break;
+            case 'showSettings': window.location.href = 'setting.html'; break;
+            case 'logout': if (confirm('Yakin ingin keluar?')) { localStorage.clear(); window.location.href = '../index.html'; } break;
+        }
 
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
+        userProfile.classList.remove('active');
+        dropdownMenu.classList.remove('show');
+    });
 
-    // =================================================================================
-    // INITIALIZATION
-    // =================================================================================
-
+    // === INITIALIZATION ===
     function initializeDashboard() {
-        if (!localStorage.getItem('isLoggedIn')) {
-            window.location.href = '../index.html';
-            return;
-        }
-
+        if (!localStorage.getItem('isLoggedIn')) { window.location.href = '../index.html'; return; }
         const storedUsername = localStorage.getItem('username');
-        if (storedUsername) {
-            userNameEl.textContent = storedUsername;
-        }
-
-        // Render awal dari state yang ada (termasuk dari localStorage)
-        updateUI();
+        if (storedUsername) userNameEl.textContent = storedUsername;
+        fetchInitialData();
+        updateCartBadge();
     }
 
     initializeDashboard();
