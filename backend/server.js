@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2');
 const path = require('path');
+const bcrypt = require('bcrypt');
 
 // 2. Inisialisasi aplikasi express
 const app = express();
@@ -30,27 +31,27 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '..')));
 
 // 5. API Endpoint untuk Login
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
-    const sql = "SELECT * FROM pelanggan WHERE telp_satu = ?";
-    db.query(sql, [username], (err, results) => {
-        if (err) return res.status(500).json({ success: false, message: 'Server error' });
-        if (results.length === 0) return res.status(404).json({ success: false, message: 'No HP tidak terdaftar' });
-        const user = results[0];
-        if (password === user.password) {
-            res.json({ 
-            success: true, 
-            message: 'Login berhasil!', 
-            user: { 
-                nama: user.nama_pelanggan, 
-                kd_pelanggan: user.kd_pelanggan 
-                } 
-            });
+     try {
+        const [rows] = await db.promise().query('SELECT * FROM pelanggan WHERE telp_satu = ?', [username]);
 
-        } else {
-            res.status(401).json({ success: false, message: 'Kata sandi salah' });
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'Pengguna tidak ditemukan' });
         }
-    });
+
+        const user = rows[0];
+
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            return res.status(401).json({ message: 'Password salah' });
+        }
+
+        return res.json({ message: 'Login berhasil', user });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Terjadi kesalahan server' });
+    }
 });
 
 // 6. API Endpoint untuk Produk (dengan Pencarian & Pagination)
@@ -224,26 +225,31 @@ app.get('/api/orders', (req, res) => {
     });
 });
 
-app.post('/api/change-password', (req, res) => {
+app.post('/api/change-password', async (req, res) => {
     const { kd_pelanggan, oldPassword, newPassword } = req.body;
 
-    const getUserSql = "SELECT password FROM pelanggan WHERE kd_pelanggan = ?";
-    db.query(getUserSql, [kd_pelanggan], (err, results) => {
-        if (err) return res.status(500).json({ success: false, message: 'Server error' });
-        if (results.length === 0) return res.status(404).json({ success: false, message: 'User tidak ditemukan' });
+    try {
+        const [rows] = await db.promise().query('SELECT password FROM pelanggan WHERE kd_pelanggan = ?', [kd_pelanggan]);
 
-        const currentPassword = results[0].password;
-
-        if (oldPassword !== currentPassword) {
-            return res.status(401).json({ success: false, message: 'Password lama salah' });
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'User tidak ditemukan' });
         }
 
-        const updateSql = "UPDATE pelanggan SET password = ? WHERE kd_pelanggan = ?";
-        db.query(updateSql, [newPassword, kd_pelanggan], (err, result) => {
-            if (err) return res.status(500).json({ success: false, message: 'Gagal mengubah password' });
-            res.json({ success: true, message: 'Password berhasil diperbarui' });
-        });
-    });
+        const isMatch = await bcrypt.compare(oldPassword, rows[0].password);
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: 'Password lama salah' });
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+        await db.promise().query('UPDATE pelanggan SET password = ? WHERE kd_pelanggan = ?', [hashedNewPassword, kd_pelanggan]);
+
+        res.json({ success: true, message: 'Password berhasil diubah' });
+
+    } catch (error) {
+        console.error('Gagal mengubah password:', error);
+        res.status(500).json({ success: false, message: 'Terjadi kesalahan server' });
+    }
 });
 
 // 8. Jalankan server
