@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // === STATE APLIKASI ===
-    let currentPage = 1;
+    // === STATE APLI    // Enhanced category rendering with auto-scroll (moved above)
+    // function renderCategories is now defined above with auto-scroll feature  let currentPage = 1;
     let totalPages = 1;
     let currentSearchTerm = '';
     let currentCategory = 'semua';
@@ -51,6 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
         cardElement.innerHTML = `<div class="product-image-container"><img src="${productData.image || '../assets/imgs/placeholder.png'}" alt="${productData.name}"></div><div class="product-content"><div class="product-info"><h3>${productData.name}</h3><div class="price-container"><p class="price">Rp${(productData.price || 0).toLocaleString('id-ID')}</p></div></div><div class="action-container">${buttonHtml}</div></div>`;
     }
 
+
+
+    // Enhanced category rendering
     function renderCategories(categories) {
         categoryList.querySelectorAll('.category-btn:not([data-category="semua"])').forEach(btn => btn.remove());
         categories.forEach(category => {
@@ -62,6 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 categoryList.appendChild(button);
             }
         });
+        
+        // Update fade effects after rendering
+        setTimeout(() => {
+            updateCategoryFadeEffects();
+        }, 100);
     }
 
     // 2. Fungsi Fetch Data (Komunikasi dengan Backend)
@@ -139,6 +147,86 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Function to update fade effects and scroll indicators based on scroll position
+    function updateCategoryFadeEffects() {
+        const container = document.getElementById('categoryListContainer');
+        const list = categoryList;
+        const leftIndicator = document.getElementById('scrollIndicatorLeft');
+        const rightIndicator = document.getElementById('scrollIndicatorRight');
+        
+        if (!container || !list) return;
+        
+        const scrollLeft = list.scrollLeft;
+        const maxScrollLeft = list.scrollWidth - list.clientWidth;
+        
+        // Remove/add fade classes based on scroll position
+        if (scrollLeft <= 5) {
+            container.classList.add('no-left-fade');
+            if (leftIndicator) leftIndicator.classList.remove('show');
+        } else {
+            container.classList.remove('no-left-fade');
+            if (leftIndicator) leftIndicator.classList.add('show');
+        }
+        
+        if (scrollLeft >= maxScrollLeft - 5) {
+            container.classList.add('no-right-fade');
+            if (rightIndicator) rightIndicator.classList.remove('show');
+        } else {
+            container.classList.remove('no-right-fade');
+            if (rightIndicator) rightIndicator.classList.add('show');
+        }
+        
+        // Hide indicators if there's no overflow
+        if (maxScrollLeft <= 0) {
+            if (leftIndicator) leftIndicator.classList.remove('show');
+            if (rightIndicator) rightIndicator.classList.remove('show');
+        }
+    }
+
+    // Add scroll event listener to category list
+    function initializeCategoryScrollEffects() {
+        categoryList.addEventListener('scroll', updateCategoryFadeEffects);
+        
+        // Initialize scroll indicators
+        initializeScrollIndicators();
+        
+        // Initial check
+        setTimeout(updateCategoryFadeEffects, 100);
+        
+        // Check on window resize
+        window.addEventListener('resize', () => {
+            setTimeout(updateCategoryFadeEffects, 100);
+        });
+    }
+
+    // Add click handlers for scroll indicators
+    function initializeScrollIndicators() {
+        const leftIndicator = document.getElementById('scrollIndicatorLeft');
+        const rightIndicator = document.getElementById('scrollIndicatorRight');
+        
+        if (leftIndicator) {
+            leftIndicator.addEventListener('click', () => {
+                categoryList.scrollBy({
+                    left: -150,
+                    behavior: 'smooth'
+                });
+            });
+            leftIndicator.style.pointerEvents = 'auto';
+            leftIndicator.style.cursor = 'pointer';
+        }
+        
+        if (rightIndicator) {
+            rightIndicator.addEventListener('click', () => {
+                categoryList.scrollBy({
+                    left: 150,
+                    behavior: 'smooth'
+                });
+            });
+            rightIndicator.style.pointerEvents = 'auto';
+            rightIndicator.style.cursor = 'pointer';
+        }
+    }
+
     // === EVENT LISTENERS ===
 
     searchInput.addEventListener('input', () => {
@@ -146,12 +234,37 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchProducts(true);
     });
 
-    categoryList.addEventListener('click', (e) => {
+    categoryList.addEventListener('click', async (e) => {
         if (e.target.matches('.category-btn')) {
-            categoryList.querySelector('.active').classList.remove('active');
+            // Prevent double-clicking
+            if (e.target.disabled) return;
+            
+            // Update UI state immediately
+            const previousActive = categoryList.querySelector('.active');
+            if (previousActive) previousActive.classList.remove('active');
             e.target.classList.add('active');
-            currentCategory = e.target.dataset.category;
-            fetchProducts(true);
+            
+            // Disable all buttons temporarily to prevent race conditions
+            const allButtons = categoryList.querySelectorAll('.category-btn');
+            allButtons.forEach(btn => btn.disabled = true);
+            
+            // Update current category
+            const newCategory = e.target.dataset.category;
+            currentCategory = newCategory;
+            
+            // Show loading state
+            productGrid.innerHTML = '<div class="loading-container"><div class="loading-spinner"></div><p>Memuat produk...</p></div>';
+            
+            try {
+                // Fetch products for selected category
+                await fetchProducts(true);
+            } catch (error) {
+                console.error('Error filtering kategori:', error);
+                productGrid.innerHTML = '<p class="error-message">Gagal memuat produk. Silakan coba lagi.</p>';
+            } finally {
+                // Re-enable all buttons
+                allButtons.forEach(btn => btn.disabled = false);
+            }
         }
     });
 
@@ -216,6 +329,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (storedUsername) userNameEl.textContent = storedUsername;
         fetchInitialData();
         updateCartBadge();
+        initializeCategoryScrollEffects();
+        initializeScrollIndicators();
     }
 
     initializeDashboard();
