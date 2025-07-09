@@ -47,7 +47,12 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ message: 'Password salah' });
         }
 
-        return res.json({ message: 'Login berhasil', user });
+        return res.json({ message: 'Login berhasil', 
+            user: {
+                nama: user.nama_pelanggan,
+                kd_pelanggan: user.kd_pelanggan,
+            } 
+        });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message: 'Terjadi kesalahan server' });
