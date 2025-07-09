@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug localStorage</title>
+</head>
+<body>
+    <h1>Debug localStorage - User Data</h1>
+    <button onclick="checkData()">Check localStorage Data</button>
+    <button onclick="clearData()">Clear localStorage</button>
+    <div id="result"></div>
+
+    <script>
+        function checkData() {
+            const result = document.getElementById('result');
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const username = localStorage.getItem('username'); // Ini harusnya NAMA user
+            const userPhone = localStorage.getItem('userPhone'); // Ini harusnya NOMOR HP user
+            
+            result.innerHTML = `
+                <h3>localStorage Data:</h3>
+                <p><strong>isLoggedIn:</strong> ${isLoggedIn}</p>
+                <p><strong>username (harusnya NAMA):</strong> ${username}</p>
+                <p><strong>userPhone (harusnya NOMOR HP):</strong> ${userPhone}</p>
+                <hr>
+                <h3>Expected:</h3>
+                <p>- username = "John Doe" (nama lengkap)</p>
+                <p>- userPhone = "081234567890" (nomor HP login)</p>
+                <hr>
+                <h3>All localStorage Keys:</h3>
+                <pre>${JSON.stringify(Object.keys(localStorage), null, 2)}</pre>
+            `;
+        }
+        
+        function clearData() {
+            localStorage.clear();
+            alert('localStorage cleared!');
+            checkData();
+        }
+        
+        // Auto check on page load
+        checkData();
+    </script>
+</body>
+</html>

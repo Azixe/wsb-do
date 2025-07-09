@@ -155,17 +155,61 @@ app.post('/api/orders', (req, res) => {
     });
 });
 
-// API ENDPOINT UNTUK MENGAMBIL SEMUA PESANAN
+// API ENDPOINT UNTUK MENGAMBIL PESANAN BERDASARKAN USER
 app.get('/api/orders', (req, res) => {
-    // Di aplikasi nyata, kita akan filter berdasarkan kd_pelanggan yang login.
-    // Untuk sekarang, kita ambil semua pesanan.
-    const sql = "SELECT * FROM orders ORDER BY tanggal_pesanan DESC";
+    const { user } = req.query;
+    const authHeader = req.headers.authorization;
+    const userIdHeader = req.headers['x-user-id'];
+    
+    // Untuk debugging, tambahkan endpoint tanpa autentikasi dulu
+    if (req.query.debug === 'true') {
+        const debugSql = "SELECT order_id, nama_pelanggan, telepon_pelanggan, tanggal_pesanan FROM orders ORDER BY tanggal_pesanan DESC LIMIT 10";
+        db.query(debugSql, (err, results) => {
+            if (err) {
+                return res.status(500).json({ success: false, message: "Debug query error" });
+            }
+            return res.json({ 
+                debug: true, 
+                message: "Debug mode - showing all recent orders", 
+                orders: results,
+                searchingFor: user
+            });
+        });
+        return;
+    }
+    
+    // Validasi autentikasi - pastikan ada parameter user dan headers
+    if (!user || !authHeader || !userIdHeader) {
+        return res.status(401).json({ 
+            success: false, 
+            message: "Akses tidak sah. Silakan login kembali." 
+        });
+    }
+    
+    // Validasi konsistensi user ID di parameter dan headers
+    if (user !== userIdHeader || !authHeader.includes(user)) {
+        return res.status(403).json({ 
+            success: false, 
+            message: "Akses ditolak. Data user tidak konsisten." 
+        });
+    }
+    
+    // Filter pesanan berdasarkan nomor telepon ATAU nama pelanggan
+    const sql = `
+        SELECT * FROM orders 
+        WHERE telepon_pelanggan = ? OR nama_pelanggan = ?
+        ORDER BY tanggal_pesanan DESC
+    `;
 
-    db.query(sql, (err, results) => {
+    db.query(sql, [user, user], (err, results) => {
         if (err) {
             console.error("Error mengambil data pesanan:", err);
             return res.status(500).json({ success: false, message: "Server error" });
         }
+        
+        console.log(`User ${user} searching for orders...`);
+        console.log(`Found ${results.length} pesanan`);
+        console.log('Sample order data:', results[0] || 'No orders found');
         res.json(results);
     });
 });

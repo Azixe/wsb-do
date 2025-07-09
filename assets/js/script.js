@@ -91,8 +91,9 @@ async function handleLogin(e) {
         if (response.ok) { // Jika server merespons dengan status sukses (2xx)
             // Login berhasil
             localStorage.setItem('isLoggedIn', 'true');
-            // Kita bisa simpan nama pengguna yang dikembalikan dari server
+            // Simpan nama dan nomor HP user
             localStorage.setItem('username', data.user.nama);
+            localStorage.setItem('userPhone', username); // Simpan nomor HP yang digunakan login
             window.location.href = 'pages/dashboard.html';
         } else {
             // Jika server merespons dengan error (4xx atau 5xx)

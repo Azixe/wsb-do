@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Backend Connection</title>
+</head>
+<body>
+    <h1>Test Backend Connection</h1>
+    <button onclick="testProducts()">Test Products API</button>
+    <button onclick="testOrders()">Test Orders API</button>
+    <div id="result"></div>
+
+    <script>
+        async function testProducts() {
+            const result = document.getElementById('result');
+            try {
+                const response = await fetch('http://localhost:3001/api/products?page=1');
+                const data = await response.json();
+                result.innerHTML = `<h3>Products API:</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                result.innerHTML = `<h3>Products API Error:</h3><p>${error.message}</p>`;
+            }
+        }
+
+        async function testOrders() {
+            const result = document.getElementById('result');
+            try {
+                const response = await fetch('http://localhost:3001/api/orders?user=admin', {
+                    headers: {
+                        'Authorization': 'Bearer admin',
+                        'X-User-ID': 'admin'
+                    }
+                });
+                const data = await response.json();
+                result.innerHTML = `<h3>Orders API:</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                result.innerHTML = `<h3>Orders API Error:</h3><p>${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
