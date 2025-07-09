@@ -170,6 +170,29 @@
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
+/* Customer Info Display */
+.customer-info {
+    background-color: #f9fafb;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #e5e7eb;
+}
+
+.customer-info p {
+    margin: 8px 0;
+    color: #374151;
+}
+
+.customer-info strong {
+    color: #111827;
+    font-weight: 600;
+}
+
+.customer-info span {
+    color: #6b7280;
+}
+
 /* --- Media Queries --- */
 
 /* Tablet & Layar Sedang */

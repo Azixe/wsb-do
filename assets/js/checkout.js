@@ -1,13 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // === VALIDASI LOGIN ===
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const userDisplayName = localStorage.getItem('username'); // Nama lengkap user untuk display
+    const userPhoneNumber = localStorage.getItem('userPhone'); // Nomor HP yang digunakan login
+    
+    console.log('Checkout data:', { 
+        displayName: userDisplayName, 
+        phoneNumber: userPhoneNumber 
+    }); // Debug log
+    
+    if (!isLoggedIn || isLoggedIn !== 'true' || !userDisplayName) {
+        alert('Anda harus login terlebih dahulu.');
+        window.location.href = '../index.html';
+        return;
+    }
+    
     // === DOM ELEMENTS ===
     const summaryItemsList = document.getElementById('summaryItemsList');
     const summarySubtotalEl = document.getElementById('summarySubtotal');
     const summaryShippingEl = document.getElementById('summaryShipping');
     const summaryTotalEl = document.getElementById('summaryTotal');
     const placeOrderBtn = document.getElementById('placeOrderBtn');
-    const fullNameInput = document.getElementById('fullName');
-    const phoneInput = document.getElementById('phone');
+    const customerNameEl = document.getElementById('customerName');
+    const customerPhoneEl = document.getElementById('customerPhone');
     const addressInput = document.getElementById('address');
+
+    // === FILL USER DATA ===
+    customerNameEl.textContent = userDisplayName || 'Nama tidak tersedia';
+    customerPhoneEl.textContent = userPhoneNumber || 'Nomor HP tidak tersedia';
 
     // === DATA ===
     const cart = JSON.parse(localStorage.getItem('wsbCart')) || {};
@@ -47,16 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function validateForm() {
-        if (fullNameInput.value.trim() === '') {
-            alert('Nama Lengkap harus diisi.');
-            fullNameInput.focus();
-            return false;
-        }
-        if (phoneInput.value.trim() === '') {
-            alert('No. Handphone harus diisi.');
-            phoneInput.focus();
-            return false;
-        }
         if (addressInput.value.trim() === '') {
             alert('Alamat Lengkap harus diisi.');
             addressInput.focus();
@@ -77,8 +87,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 orderId: 'WSB-' + Date.now(),
                 totalAmount: finalTotal,
                 shippingAddress: {
-                    name: fullNameInput.value,
-                    phone: phoneInput.value,
+                    name: userDisplayName, // Nama user dari localStorage
+                    phone: userPhoneNumber, // Nomor HP user dari localStorage
                     address: addressInput.value
                 }
             },
