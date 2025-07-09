@@ -93,6 +93,7 @@ async function handleLogin(e) {
             localStorage.setItem('isLoggedIn', 'true');
             // Kita bisa simpan nama pengguna yang dikembalikan dari server
             localStorage.setItem('username', data.user.nama);
+            localStorage.setItem('kd_pelanggan', data.user.kd_pelanggan);
             window.location.href = 'pages/dashboard.html';
         } else {
             // Jika server merespons dengan error (4xx atau 5xx)

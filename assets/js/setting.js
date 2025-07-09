@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const changePasswordForm = document.getElementById('changePasswordForm');
 
-    changePasswordForm.addEventListener('submit', (e) => {
+    changePasswordForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const oldPassword = document.getElementById('oldPassword').value;
@@ -29,16 +29,32 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // --- Simulasi Validasi Backend ---
-        // Di aplikasi nyata, Anda akan mengirim `oldPassword` ke server untuk divalidasi.
-        // Untuk sekarang, kita anggap password lama yang benar adalah 'admin123'.
-        if (oldPassword !== 'admin123') {
-            alert('Kata sandi lama salah!');
+       const kdPelanggan = localStorage.getItem('kd_pelanggan');
+        if (!kdPelanggan) {
+            alert('Anda belum login.');
             return;
         }
 
-        // Jika semua validasi lolos
-        alert('Kata sandi berhasil diubah! (Ini adalah simulasi, password login Anda tetap admin123)');
-        changePasswordForm.reset(); // Mengosongkan form
+        try {
+            const res = await fetch('http://localhost:3001/api/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    kd_pelanggan: kdPelanggan,
+                    oldPassword,
+                    newPassword
+                })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                alert('Password berhasil diubah!');
+                changePasswordForm.reset();
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            alert('Gagal mengubah password.');
+        }
     });
 });

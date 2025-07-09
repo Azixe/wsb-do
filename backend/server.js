@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2');
+const path = require('path');
 
 // 2. Inisialisasi aplikasi express
 const app = express();
@@ -26,6 +27,7 @@ db.connect((err) => {
 // 4. Gunakan middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '..')));
 
 // 5. API Endpoint untuk Login
 app.post('/api/login', (req, res) => {
@@ -36,7 +38,15 @@ app.post('/api/login', (req, res) => {
         if (results.length === 0) return res.status(404).json({ success: false, message: 'No HP tidak terdaftar' });
         const user = results[0];
         if (password === user.password) {
-            res.json({ success: true, message: 'Login berhasil!', user: { nama: user.nama_pelanggan } });
+            res.json({ 
+            success: true, 
+            message: 'Login berhasil!', 
+            user: { 
+                nama: user.nama_pelanggan, 
+                kd_pelanggan: user.kd_pelanggan 
+                } 
+            });
+
         } else {
             res.status(401).json({ success: false, message: 'Kata sandi salah' });
         }
@@ -169,6 +179,29 @@ app.get('/api/orders', (req, res) => {
         res.json(results);
     });
 });
+
+app.post('/api/change-password', (req, res) => {
+    const { kd_pelanggan, oldPassword, newPassword } = req.body;
+
+    const getUserSql = "SELECT password FROM pelanggan WHERE kd_pelanggan = ?";
+    db.query(getUserSql, [kd_pelanggan], (err, results) => {
+        if (err) return res.status(500).json({ success: false, message: 'Server error' });
+        if (results.length === 0) return res.status(404).json({ success: false, message: 'User tidak ditemukan' });
+
+        const currentPassword = results[0].password;
+
+        if (oldPassword !== currentPassword) {
+            return res.status(401).json({ success: false, message: 'Password lama salah' });
+        }
+
+        const updateSql = "UPDATE pelanggan SET password = ? WHERE kd_pelanggan = ?";
+        db.query(updateSql, [newPassword, kd_pelanggan], (err, result) => {
+            if (err) return res.status(500).json({ success: false, message: 'Gagal mengubah password' });
+            res.json({ success: true, message: 'Password berhasil diperbarui' });
+        });
+    });
+});
+
 // 8. Jalankan server
 app.listen(PORT, () => {
     console.log(`Server berhasil berjalan di http://localhost:${PORT}`);
