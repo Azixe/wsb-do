@@ -1,21 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
     const orderListContainer = document.getElementById('orderList');
 
-    // Fungsi untuk menampilkan modal (tidak berubah)
-    function showDetailModal(orderDataString) {
-        const order = JSON.parse(orderDataString);
+    function showDetailModal(order) {
+        // Hapus modal lama jika ada, untuk mencegah tumpukan
+        const existingModal = document.querySelector('.modal-overlay');
+        if (existingModal) {
+            existingModal.remove();
+        }
 
-        // Data 'items' dari database adalah JSON string, jadi perlu di-parse lagi
-        const itemsInCart = JSON.parse(order.items);
+        // Pastikan order.items adalah objek, bukan string
+        let itemsInCart = {};
+        try {
+            // Data items dari database bisa jadi adalah string, kita perlu parse
+            itemsInCart = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+        } catch (e) {
+            console.error("Gagal mem-parsing item pesanan:", e);
+            itemsInCart = {};
+        }
+
         let itemsHtml = '<ul>';
         for (const productId in itemsInCart) {
             const item = itemsInCart[productId];
-            itemsHtml += `<li>${item.name} (x${item.quantity})</li>`;
+            itemsHtml += `<li>${item.name || 'Nama Produk tidak ada'} (x${item.quantity || 0})</li>`;
         }
         itemsHtml += '</ul>';
 
         const modalOverlay = document.createElement('div');
-        modalOverlay.className = 'modal-overlay';
+        modalOverlay.className = 'modal-overlay show';
         modalOverlay.innerHTML = `
             <div class="modal-content">
                 <div class="modal-header">
@@ -27,15 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${itemsHtml}
                     <h4>Detail Pengiriman</h4>
                     <p>
-                        <strong>Nama:</strong> ${order.nama_pelanggan}<br>
-                        <strong>Telepon:</strong> ${order.telepon_pelanggan}<br>
-                        <strong>Alamat:</strong> ${order.alamat_pengiriman}
+                        <strong>Nama:</strong> ${order.nama_pelanggan || '-'}<br>
+                        <strong>Telepon:</strong> ${order.telepon_pelanggan || '-'}<br>
+                        <strong>Alamat:</strong> ${order.alamat_pengiriman || '-'}
                     </p>
                     <h4>Rincian Pembayaran</h4>
-                    <p>Total: <strong>Rp${order.total_harga.toLocaleString('id-ID')}</strong></p>
+                    <p>Total: <strong>Rp${(order.total_harga || 0).toLocaleString('id-ID')}</strong></p>
                 </div>
             </div>`;
         document.body.appendChild(modalOverlay);
+
+        // Listener untuk menutup modal
         modalOverlay.addEventListener('click', e => {
             if (e.target.closest('[data-action="close"]') || e.target === modalOverlay) {
                 modalOverlay.remove();
@@ -43,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Fungsi utama untuk mengambil dan menampilkan pesanan dari backend
     async function fetchAndRenderOrders() {
         orderListContainer.innerHTML = '<p>Memuat riwayat pesanan...</p>';
         try {
@@ -61,12 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
             orders.forEach(order => {
                 const orderCard = document.createElement('div');
                 orderCard.className = 'order-card';
-                orderCard.dataset.orderData = JSON.stringify(order); // Simpan data lengkap untuk modal
 
                 const orderDate = new Date(order.tanggal_pesanan);
-                const formattedDate = orderDate.toLocaleDateString('id-ID', {
-                    day: 'numeric', month: 'long', year: 'numeric'
-                });
+                const formattedDate = orderDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
                 orderCard.innerHTML = `
                     <div class="order-header">
@@ -74,13 +83,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="order-date">${formattedDate}</span>
                     </div>
                     <div class="order-body">
-                        <div class="order-total">
-                            Total Pembayaran: <span>Rp${order.total_harga.toLocaleString('id-ID')}</span>
-                        </div>
+                        <div class="order-total">Total Pembayaran: <span>Rp${order.total_harga.toLocaleString('id-ID')}</span></div>
                     </div>
                     <div class="order-footer">
-                        <button class="details-btn" data-action="showDetail">Lihat Detail</button>
+                        <button class="details-btn">Lihat Detail</button>
                     </div>`;
+
+                // Pasang event listener langsung ke tombol di setiap kartu
+                orderCard.querySelector('.details-btn').addEventListener('click', () => {
+                    showDetailModal(order);
+                });
+
                 orderListContainer.appendChild(orderCard);
             });
 
@@ -90,15 +103,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Event listener untuk tombol "Lihat Detail"
-    orderListContainer.addEventListener('click', (e) => {
-        const targetButton = e.target.closest('[data-action="showDetail"]');
-        if (targetButton) {
-            const orderCard = e.target.closest('.order-card');
-            showDetailModal(orderCard.dataset.orderData);
-        }
-    });
-
-    // Panggil fungsi utama saat halaman dimuat
     fetchAndRenderOrders();
 });
