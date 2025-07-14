@@ -266,6 +266,52 @@
     font-weight: 600;
 }
 
+.order-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.status-label {
+    font-size: 0.9rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status.diproses {
+    background-color: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fbbf24;
+}
+
+.status.dikirim {
+    background-color: #dbeafe;
+    color: #2563eb;
+    border: 1px solid #60a5fa;
+}
+
+.status.selesai {
+    background-color: #dcfce7;
+    color: #16a34a;
+    border: 1px solid #4ade80;
+}
+
+.status.dibatalkan {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #f87171;
+}
+
 .order-footer {
     display: flex;
     justify-content: flex-end;

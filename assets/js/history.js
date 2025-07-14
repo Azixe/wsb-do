@@ -148,6 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="order-body">
                         <div class="order-total">Total Pembayaran: <span>Rp${order.total_harga.toLocaleString('id-ID')}</span></div>
+                        <div class="order-status">
+                            <span class="status-label">Status:</span>
+                            <span class="status ${(order.status_pesanan || 'diproses').toLowerCase()}">${order.status_pesanan || 'Diproses'}</span>
+                        </div>
                     </div>
                     <div class="order-footer">
                         <button class="details-btn">Lihat Detail</button>
