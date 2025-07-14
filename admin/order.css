@@ -1,0 +1,315 @@
+body {
+    background-color: #f4f7fa;
+    font-family: 'Inter', sans-serif;
+}
+
+.admin-container {
+    max-width: 1400px;
+    margin: 32px auto;
+    padding: 0 32px;
+}
+
+.admin-container h1 {
+    font-size: 1.8rem;
+    margin-bottom: 24px;
+    color: #111827;
+}
+
+.admin-nav {
+    display: flex;
+    gap: 20px;
+}
+
+.admin-nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.admin-nav a.active,
+.admin-nav a:hover {
+    background-color: #eef2ff;
+    color: #4338ca;
+}
+
+.order-table-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+}
+
+#ordersTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#ordersTable th,
+#ordersTable td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+#ordersTable th {
+    background-color: #f9fafb;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+
+#ordersTable tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+#ordersTable td {
+    font-size: 14px;
+    color: #374151;
+}
+
+.status {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 12px;
+    text-align: center;
+    color: #374151;
+}
+
+.status.processed {
+    background-color: #f59e0b;
+}
+
+.status.shipped {
+    background-color: #3b82f6;
+}
+
+.status.completed {
+    background-color: #10b981;
+}
+
+.details-btn {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    background-color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.details-btn:hover {
+    background-color: #eef2ff;
+    border-color: #818cf8;
+}
+
+/* --- Style untuk Modal --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 16px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #111827;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #6b7280;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-body h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 16px 0 8px 0;
+}
+
+.modal-body ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin: 0;
+    color: #6b7280;
+}
+
+.modal-body p {
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.status-form {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.status-form label {
+    font-weight: 600;
+}
+
+.status-form select {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+}
+
+.status-form button {
+    padding: 8px 16px;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 16px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #111827;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #6b7280;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-body h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 16px 0 8px 0;
+}
+
+.modal-body ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+    color: #6b7280;
+}
+
+.modal-body ul li {
+    padding: 4px 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-body p {
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.status-form {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.status-form label {
+    font-weight: 600;
+}
+
+.status-form select {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    flex-grow: 1;
+}
+
+.status-form button {
+    padding: 8px 16px;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}

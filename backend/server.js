@@ -33,7 +33,7 @@ app.use(express.static(path.join(__dirname, '..')));
 // 5. API Endpoint untuk Login
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
-     try {
+    try {
         const [rows] = await db.promise().query('SELECT * FROM pelanggan WHERE telp_satu = ?', [username]);
 
         if (rows.length === 0) {
@@ -47,11 +47,12 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ message: 'Password salah' });
         }
 
-        return res.json({ message: 'Login berhasil', 
+        return res.json({
+            message: 'Login berhasil',
             user: {
                 nama: user.nama_pelanggan,
                 kd_pelanggan: user.kd_pelanggan,
-            } 
+            }
         });
     } catch (err) {
         console.error(err);
@@ -104,8 +105,6 @@ app.get('/api/categories', (req, res) => {
         res.json(results.map(row => row.kategori));
     });
 });
-
-// ... (kode API login, products, dan categories yang sudah ada) ...
 
 // 8. API ENDPOINT BARU UNTUK MENYIMPAN PESANAN
 app.post('/api/orders', (req, res) => {
@@ -176,7 +175,7 @@ app.get('/api/orders', (req, res) => {
     const { user } = req.query;
     const authHeader = req.headers.authorization;
     const userIdHeader = req.headers['x-user-id'];
-    
+
     // Untuk debugging, tambahkan endpoint tanpa autentikasi dulu
     if (req.query.debug === 'true') {
         const debugSql = "SELECT order_id, nama_pelanggan, telepon_pelanggan, tanggal_pesanan FROM orders ORDER BY tanggal_pesanan DESC LIMIT 10";
@@ -184,32 +183,32 @@ app.get('/api/orders', (req, res) => {
             if (err) {
                 return res.status(500).json({ success: false, message: "Debug query error" });
             }
-            return res.json({ 
-                debug: true, 
-                message: "Debug mode - showing all recent orders", 
+            return res.json({
+                debug: true,
+                message: "Debug mode - showing all recent orders",
                 orders: results,
                 searchingFor: user
             });
         });
         return;
     }
-    
+
     // Validasi autentikasi - pastikan ada parameter user dan headers
     if (!user || !authHeader || !userIdHeader) {
-        return res.status(401).json({ 
-            success: false, 
-            message: "Akses tidak sah. Silakan login kembali." 
+        return res.status(401).json({
+            success: false,
+            message: "Akses tidak sah. Silakan login kembali."
         });
     }
-    
+
     // Validasi konsistensi user ID di parameter dan headers
     if (user !== userIdHeader || !authHeader.includes(user)) {
-        return res.status(403).json({ 
-            success: false, 
-            message: "Akses ditolak. Data user tidak konsisten." 
+        return res.status(403).json({
+            success: false,
+            message: "Akses ditolak. Data user tidak konsisten."
         });
     }
-    
+
     // Filter pesanan berdasarkan nomor telepon ATAU nama pelanggan
     const sql = `
         SELECT * FROM orders 
@@ -222,7 +221,7 @@ app.get('/api/orders', (req, res) => {
             console.error("Error mengambil data pesanan:", err);
             return res.status(500).json({ success: false, message: "Server error" });
         }
-        
+
         console.log(`User ${user} searching for orders...`);
         console.log(`Found ${results.length} pesanan`);
         console.log('Sample order data:', results[0] || 'No orders found');
@@ -255,6 +254,111 @@ app.post('/api/change-password', async (req, res) => {
         console.error('Gagal mengubah password:', error);
         res.status(500).json({ success: false, message: 'Terjadi kesalahan server' });
     }
+});
+
+app.get('/api/admin/orders', (req, res) => {
+    // Query ini mengambil semua pesanan, diurutkan dari yang paling baru
+    const sql = "SELECT * FROM orders ORDER BY tanggal_pesanan DESC";
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("Error mengambil semua data pesanan:", err);
+            return res.status(500).json({ success: false, message: "Server error" });
+        }
+        res.json(results); // Kirim semua data pesanan sebagai respons
+    });
+});
+
+app.get('/api/admin/orders/:orderId', (req, res) => {
+    const { orderId } = req.params;
+
+    // Ambil data utama dari tabel 'orders'
+    const orderSql = "SELECT * FROM orders WHERE order_id = ?";
+    db.query(orderSql, [orderId], (err, orderResult) => {
+        if (err) return res.status(500).json({ message: "Server error" });
+        if (orderResult.length === 0) return res.status(404).json({ message: "Pesanan tidak ditemukan" });
+
+        // Ambil data item dari tabel 'order_items'
+        const itemsSql = "SELECT * FROM order_items WHERE order_id = ?";
+        db.query(itemsSql, [orderId], (err, itemsResult) => {
+            if (err) return res.status(500).json({ message: "Server error" });
+
+            // Gabungkan hasilnya
+            const orderDetails = {
+                ...orderResult[0],
+                items: itemsResult
+            };
+            res.json(orderDetails);
+        });
+    });
+});
+
+// API BARU: Memperbarui status pesanan
+app.patch('/api/admin/orders/:orderId/status', (req, res) => {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+        return res.status(400).json({ message: "Status baru harus disediakan" });
+    }
+
+    const sql = "UPDATE orders SET status_pesanan = ? WHERE order_id = ?";
+    db.query(sql, [status, orderId], (err, result) => {
+        if (err) {
+            console.error("Error memperbarui status:", err);
+            return res.status(500).json({ message: "Gagal memperbarui status pesanan" });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Pesanan tidak ditemukan" });
+        }
+        res.json({ success: true, message: `Status pesanan #${orderId} berhasil diubah menjadi ${status}` });
+    });
+});
+
+app.get('/api/admin/orders/:orderId', (req, res) => {
+    const { orderId } = req.params;
+    let orderDetails;
+
+    // 1. Ambil data utama dari tabel 'orders'
+    const orderSql = "SELECT * FROM orders WHERE order_id = ?";
+    db.query(orderSql, [orderId], (err, orderResult) => {
+        if (err) return res.status(500).json({ message: "Server error saat mengambil pesanan" });
+        if (orderResult.length === 0) return res.status(404).json({ message: "Pesanan tidak ditemukan" });
+
+        orderDetails = orderResult[0];
+
+        // 2. Ambil data item dari tabel 'order_items'
+        const itemsSql = "SELECT * FROM order_items WHERE order_id = ?";
+        db.query(itemsSql, [orderId], (err, itemsResult) => {
+            if (err) return res.status(500).json({ message: "Server error saat mengambil item" });
+
+            // 3. Gabungkan hasilnya dan kirim sebagai respons
+            orderDetails.items = itemsResult;
+            res.json(orderDetails);
+        });
+    });
+});
+
+// API BARU: Memperbarui status pesanan
+app.patch('/api/admin/orders/:orderId/status', (req, res) => {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+        return res.status(400).json({ message: "Status baru harus disediakan" });
+    }
+
+    const sql = "UPDATE orders SET status_pesanan = ? WHERE order_id = ?";
+    db.query(sql, [status, orderId], (err, result) => {
+        if (err) {
+            console.error("Error memperbarui status:", err);
+            return res.status(500).json({ message: "Gagal memperbarui status pesanan" });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Pesanan tidak ditemukan" });
+        }
+        res.json({ success: true, message: `Status pesanan berhasil diubah menjadi ${status}` });
+    });
 });
 
 // 8. Jalankan server
