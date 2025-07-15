@@ -5,7 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Manajemen Pesanan</title>
-    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/wsb-do/assets/css/dashboard.css">
     <link rel="stylesheet" href="order.css">
     <script defer src="order.js"></script>
 </head>
@@ -13,30 +17,98 @@
 <body>
     <header class="navbar">
         <div class="logo">
+            <i class="fas fa-shield-alt"></i>
             <h1>Admin Panel</h1>
         </div>
         <nav class="admin-nav">
-            <a href="order.html" class="active">Manajemen Pesanan</a>
+            <a href="order.html" class="nav-link active">
+                <i class="fas fa-clipboard-list"></i>
+                Manajemen Pesanan
+            </a>
         </nav>
     </header>
 
     <main class="admin-container">
-        <h1>Daftar Pesanan Masuk</h1>
+        <div class="page-header">
+            <div class="header-content">
+                <h1><i class="fas fa-box"></i> Daftar Pesanan Masuk</h1>
+                <p>Kelola dan pantau semua pesanan yang masuk</p>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon pending">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="pendingCount">-</h3>
+                    <p>Pesanan Diproses</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon shipped">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="shippedCount">-</h3>
+                    <p>Pesanan Dikirim</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon completed">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="completedCount">-</h3>
+                    <p>Pesanan Selesai</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon revenue">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalRevenue">-</h3>
+                    <p>Total Pendapatan</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Controls -->
+        <div class="table-controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Cari pesanan...">
+            </div>
+            <div class="filter-controls">
+                <select id="statusFilter">
+                    <option value="">Semua Status</option>
+                    <option value="Diproses">Diproses</option>
+                    <option value="Dikirim">Dikirim</option>
+                    <option value="Selesai">Selesai</option>
+                </select>
+            </div>
+        </div>
+        
         <div class="order-table-container">
-            <table id="ordersTable">
-                <thead>
-                    <tr>
-                        <th>ID Pesanan</th>
-                        <th>Nama Pelanggan</th>
-                        <th>Tanggal</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="ordersTableBody">
-                </tbody>
-            </table>
+            <div class="table-wrapper">
+                <table id="ordersTable" class="orders-table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> ID Pesanan</th>
+                            <th><i class="fas fa-user"></i> Nama Pelanggan</th>
+                            <th><i class="fas fa-calendar"></i> Tanggal</th>
+                            <th><i class="fas fa-money-bill-wave"></i> Total</th>
+                            <th><i class="fas fa-info-circle"></i> Status</th>
+                            <th><i class="fas fa-cogs"></i> Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <!-- Orders will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
 </body>
