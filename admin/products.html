@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manajemen Produk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/wsb-do/assets/css/dashboard.css">
+    <link rel="stylesheet" href="order.css">
+    <link rel="stylesheet" href="products.css">
+    <script defer src="products.js"></script>
+</head>
+
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <i class="fas fa-shield-alt"></i>
+            <h1>Admin Panel</h1>
+        </div>
+        <nav class="admin-nav">
+            <a href="order.html" class="nav-link">
+                <i class="fas fa-clipboard-list"></i>
+                Manajemen Pesanan
+            </a>
+            <a href="products.html" class="nav-link active">
+                <i class="fas fa-box-open"></i>
+                Manajemen Produk
+            </a>
+        </nav>
+    </header>
+
+    <main class="admin-container">
+        <div class="page-header">
+            <div class="header-content">
+                <h1><i class="fas fa-images"></i> Manajemen Gambar Produk</h1>
+                <p>Upload dan kelola gambar untuk produk-produk Anda</p>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="upload-section">
+            <div class="upload-card">
+                <h3><i class="fas fa-cloud-upload-alt"></i> Upload Gambar Produk</h3>
+                <form id="uploadForm" class="upload-form">
+                    <div class="form-group">
+                        <label for="productSelect">Pilih Produk:</label>
+                        <select id="productSelect" required>
+                            <option value="">-- Pilih Produk --</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="imageFile">Pilih Gambar:</label>
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <input type="file" id="imageFile" accept="image/*" required>
+                            <div class="upload-placeholder">
+                                <i class="fas fa-image"></i>
+                                <p>Klik untuk memilih gambar atau drag & drop</p>
+                                <small>Format: JPG, PNG, GIF (Max: 5MB)</small>
+                            </div>
+                            <div class="image-preview hidden" id="imagePreview">
+                                <img id="previewImg" src="" alt="Preview">
+                                <button type="button" class="remove-preview" id="removePreview">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="upload-btn" id="uploadBtn">
+                        <i class="fas fa-upload"></i>
+                        Upload Gambar
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </main>
+</body>
+
+</html>

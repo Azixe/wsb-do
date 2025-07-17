@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ? `<div class="quantity-counter" data-product-id="${productData.id}"><button class="quantity-btn" data-action="decrease">-</button><span class="quantity-display">${quantity}</span><button class="quantity-btn" data-action="increase">+</button></div>`
             : `<button class="add-to-cart-btn" data-action="add" data-product-id="${productData.id}">Tambah</button>`;
 
-        cardElement.innerHTML = `<div class="product-image-container"><img src="${productData.image || '../assets/imgs/placeholder.png'}" alt="${productData.name}"></div><div class="product-content"><div class="product-info"><h3>${productData.name}</h3><div class="price-container"><p class="price">Rp${(productData.price || 0).toLocaleString('id-ID')}</p></div></div><div class="action-container">${buttonHtml}</div></div>`;
+        cardElement.innerHTML = `<div class="product-image-container"><img src="${productData.image || '../assets/imgs/placeholder.png'}" alt="${productData.name}" onerror="this.src='../assets/imgs/placeholder.png'; this.onerror=null;"></div><div class="product-content"><div class="product-info"><h3>${productData.name}</h3><div class="price-container"><p class="price">Rp${(productData.price || 0).toLocaleString('id-ID')}</p></div></div><div class="action-container">${buttonHtml}</div></div>`;
     }
 
 
