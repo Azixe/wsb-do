@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploadPlaceholder = fileUploadArea.querySelector('.upload-placeholder');
     const imagePreview = document.getElementById('imagePreview');
     const previewImg = document.getElementById('previewImg');
-    const removePreview = document.getElementById('removePreview');
     const uploadForm = document.getElementById('uploadForm');
     const uploadBtn = document.getElementById('uploadBtn');
     const deleteCurrentBtn = document.getElementById('deleteCurrentBtn');
@@ -15,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event Listeners
     imageFile.addEventListener('change', handleFileSelect);
-    removePreview.addEventListener('click', clearPreview);
     uploadForm.addEventListener('submit', handleUpload);
     deleteCurrentBtn.addEventListener('click', handleDeleteCurrent);
     productSelect.addEventListener('change', handleProductSelection);
@@ -97,13 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsDataURL(file);
     }
 
-    function clearPreview() {
-        imageFile.value = '';
-        uploadPlaceholder.classList.remove('hidden');
-        imagePreview.classList.add('hidden');
-        previewImg.src = '';
-    }
-
     async function handleUpload(e) {
         e.preventDefault();
 
@@ -138,7 +129,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Reset form
             uploadForm.reset();
-            clearPreview();
+            uploadPlaceholder.classList.remove('hidden');
+            imagePreview.classList.add('hidden');
+            previewImg.src = '';
             
         } catch (error) {
             console.error('Upload error:', error);
