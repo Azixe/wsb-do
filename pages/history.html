@@ -21,8 +21,15 @@
     </header>
 
     <main class="history-page-container">
-        <h1>Riwayat Pesanan Anda</h1>
+        <div class="page-header">
+            <h1>Riwayat Pesanan Anda</h1>
+            <p class="page-subtitle">Lihat dan kelola semua pesanan yang pernah Anda buat</p>
+        </div>
         <div class="order-list" id="orderList">
+            <div class="loading-message">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Memuat riwayat pesanan...</p>
+            </div>
         </div>
     </main>
 </body>

@@ -105,12 +105,12 @@ app.get('/api/products', (req, res) => {
             const products = results.map(p => {
                 const productId = p.barcode ? p.barcode.trim() : null;
                 let imageUrl = '../assets/imgs/placeholder.png';
-                
+
                 // If product has image data, use the API endpoint to serve it
                 if (p.gbr && p.gbr.length > 0) {
                     imageUrl = `http://localhost:3001/api/products/${productId}/image`;
                 }
-                
+
                 return {
                     id: productId,
                     name: p.nama_produk || 'Produk Tanpa Nama',
@@ -236,11 +236,23 @@ app.get('/api/orders', (req, res) => {
         });
     }
 
-    // Filter pesanan berdasarkan nomor telepon ATAU nama pelanggan
+    // Filter pesanan berdasarkan nomor telepon ATAU nama pelanggan dengan JOIN untuk mengambil item
     const sql = `
-        SELECT * FROM orders 
-        WHERE telepon_pelanggan = ? OR nama_pelanggan = ?
-        ORDER BY tanggal_pesanan DESC
+        SELECT 
+            o.*,
+            GROUP_CONCAT(
+                JSON_OBJECT(
+                    'id', oi.kd_produk,
+                    'name', oi.nama_produk,
+                    'quantity', oi.kuantitas,
+                    'price', oi.harga_satuan
+                )
+            ) as items_json
+        FROM orders o
+        LEFT JOIN order_items oi ON o.order_id = oi.order_id
+        WHERE o.telepon_pelanggan = ? OR o.nama_pelanggan = ?
+        GROUP BY o.order_id
+        ORDER BY o.tanggal_pesanan DESC
     `;
 
     db.query(sql, [user, user], (err, results) => {
@@ -249,10 +261,34 @@ app.get('/api/orders', (req, res) => {
             return res.status(500).json({ success: false, message: "Server error" });
         }
 
+        // Parse items_json untuk setiap pesanan
+        const processedResults = results.map(order => {
+            let items = {};
+            if (order.items_json) {
+                try {
+                    // items_json berisi string JSON yang di-concat dengan koma
+                    const itemsArray = `[${order.items_json}]`;
+                    const parsedItems = JSON.parse(itemsArray);
+                    parsedItems.forEach((item, index) => {
+                        items[item.id || index] = item;
+                    });
+                } catch (e) {
+                    console.error("Error parsing items:", e);
+                    items = {};
+                }
+            }
+
+            return {
+                ...order,
+                items: items,
+                items_json: undefined // Hapus field ini dari response
+            };
+        });
+
         console.log(`User ${user} searching for orders...`);
-        console.log(`Found ${results.length} pesanan`);
-        console.log('Sample order data:', results[0] || 'No orders found');
-        res.json(results);
+        console.log(`Found ${processedResults.length} pesanan`);
+        console.log('Sample order with items:', processedResults[0] || 'No orders found');
+        res.json(processedResults);
     });
 });
 
@@ -394,28 +430,28 @@ app.patch('/api/admin/orders/:orderId/status', (req, res) => {
 app.get('/api/admin/products', (req, res) => {
     const { page = 1, limit = 12 } = req.query;
     const offset = (page - 1) * limit;
-    
+
     // First get total count
     const countSql = "SELECT COUNT(*) as total FROM pecah_stok";
-    
+
     db.query(countSql, (err, countResult) => {
         if (err) {
             console.error("Error counting products:", err);
             return res.status(500).json({ message: "Server error saat menghitung produk" });
         }
-        
+
         const totalProducts = countResult[0].total;
         const totalPages = Math.ceil(totalProducts / limit);
-        
+
         // Then get paginated products
         const sql = "SELECT barcode as id, nama_produk, harga_jual_umum as harga, kategori, gbr FROM pecah_stok ORDER BY nama_produk ASC LIMIT ? OFFSET ?";
-        
+
         db.query(sql, [parseInt(limit), parseInt(offset)], (err, results) => {
             if (err) {
                 console.error("Error fetching products:", err);
                 return res.status(500).json({ message: "Server error saat mengambil produk" });
             }
-            
+
             const products = results.map(product => ({
                 id: product.id,
                 nama_produk: product.nama_produk,
@@ -423,7 +459,7 @@ app.get('/api/admin/products', (req, res) => {
                 kategori: product.kategori,
                 gbr: product.gbr
             }));
-            
+
             res.json({
                 products,
                 totalPages,
@@ -438,19 +474,19 @@ app.get('/api/admin/products', (req, res) => {
 // Get all products for dropdown (no pagination)
 app.get('/api/admin/products/all', (req, res) => {
     const sql = "SELECT barcode as id, nama_produk, harga_jual_umum as harga FROM pecah_stok ORDER BY nama_produk ASC";
-    
+
     db.query(sql, (err, results) => {
         if (err) {
             console.error("Error fetching all products:", err);
             return res.status(500).json({ message: "Server error saat mengambil semua produk" });
         }
-        
+
         const products = results.map(product => ({
             id: product.id,
             nama_produk: product.nama_produk,
             harga: product.harga
         }));
-        
+
         res.json(products);
     });
 });
@@ -468,19 +504,19 @@ app.post('/api/products/upload-image', upload.single('image'), (req, res) => {
 
     const imageBuffer = req.file.buffer;
     const sql = "UPDATE pecah_stok SET gbr = ? WHERE barcode = ?";
-    
+
     db.query(sql, [imageBuffer, productId], (err, result) => {
         if (err) {
             console.error("Error uploading image:", err);
             return res.status(500).json({ message: "Gagal mengupload gambar" });
         }
-        
+
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: "Produk tidak ditemukan" });
         }
-        
-        res.json({ 
-            success: true, 
+
+        res.json({
+            success: true,
             message: "Gambar berhasil diupload",
             productId: productId
         });
@@ -490,21 +526,21 @@ app.post('/api/products/upload-image', upload.single('image'), (req, res) => {
 // Delete image for a specific product
 app.delete('/api/products/:productId/image', (req, res) => {
     const { productId } = req.params;
-    
+
     const sql = "UPDATE pecah_stok SET gbr = NULL WHERE barcode = ?";
-    
+
     db.query(sql, [productId], (err, result) => {
         if (err) {
             console.error("Error deleting image:", err);
             return res.status(500).json({ message: "Gagal menghapus gambar" });
         }
-        
+
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: "Produk tidak ditemukan" });
         }
-        
-        res.json({ 
-            success: true, 
+
+        res.json({
+            success: true,
             message: "Gambar berhasil dihapus",
             productId: productId
         });
@@ -514,19 +550,19 @@ app.delete('/api/products/:productId/image', (req, res) => {
 // Get image for a specific product
 app.get('/api/products/:productId/image', (req, res) => {
     const { productId } = req.params;
-    
+
     const sql = "SELECT gbr FROM pecah_stok WHERE barcode = ?";
-    
+
     db.query(sql, [productId], (err, results) => {
         if (err) {
             console.error("Error fetching image:", err);
             return res.status(500).json({ message: "Server error saat mengambil gambar" });
         }
-        
+
         if (results.length === 0 || !results[0].gbr) {
             return res.status(404).json({ message: "Gambar tidak ditemukan" });
         }
-        
+
         const imageBuffer = results[0].gbr;
         res.set('Content-Type', 'image/jpeg');
         res.send(imageBuffer);

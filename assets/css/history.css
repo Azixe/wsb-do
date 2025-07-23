@@ -218,11 +218,39 @@
     padding: 0 32px;
 }
 
+.page-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
 .history-page-container h1 {
     font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 24px;
+    margin-bottom: 8px;
     color: #111827;
+}
+
+.page-subtitle {
+    color: #6b7280;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.loading-message {
+    text-align: center;
+    padding: 40px;
+    color: #6b7280;
+}
+
+.loading-message i {
+    font-size: 2rem;
+    margin-bottom: 16px;
+    color: #3b82f6;
+}
+
+.loading-message p {
+    margin: 0;
+    font-size: 1.1rem;
 }
 
 .order-list {
@@ -264,6 +292,27 @@
 
 .order-body .order-total span {
     font-weight: 600;
+}
+
+/* Styling untuk preview item */
+.order-items-preview {
+    margin-bottom: 12px;
+    padding: 12px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    border-left: 3px solid #3b82f6;
+}
+
+.items-label {
+    font-weight: 600;
+    color: #374151;
+    margin-right: 8px;
+}
+
+.items-text {
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.4;
 }
 
 .order-status {
@@ -340,6 +389,7 @@
     padding: 40px;
     background-color: #fff;
     border-radius: 12px;
+    border: 1px solid #e5e7eb;
 }
 
 .no-history-message p {
@@ -354,6 +404,25 @@
     text-decoration: none;
     border-radius: 8px;
     font-weight: 600;
+    transition: transform 0.2s ease;
+}
+
+.no-history-message .back-to-shop-btn:hover {
+    transform: translateY(-2px);
+}
+
+.error-message {
+    text-align: center;
+    padding: 40px;
+    background-color: #fef2f2;
+    border-radius: 12px;
+    border: 1px solid #fecaca;
+}
+
+.error-message p {
+    color: #dc2626;
+    margin: 0;
+    font-weight: 500;
 }
 
 /* Ganti/tambahkan blok ini di history.css */
@@ -432,4 +501,106 @@
 
 .payment-details span:first-child {
     width: 100px;
+}
+
+/* Styling untuk detail item di modal */
+.items-container {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.item-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.item-detail:last-child {
+    border-bottom: none;
+}
+
+.item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.item-name {
+    font-weight: 600;
+    color: #111827;
+}
+
+.item-qty,
+.item-price {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.item-total {
+    font-weight: 600;
+    color: #059669;
+    text-align: right;
+}
+
+.no-items {
+    text-align: center;
+    color: #6b7280;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Styling untuk ringkasan pesanan */
+.order-summary {
+    background-color: #f8fafc;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.summary-row:last-child {
+    margin-bottom: 0;
+}
+
+.total-row {
+    border-top: 1px solid #d1d5db;
+    padding-top: 8px;
+    margin-top: 8px;
+}
+
+/* Styling untuk detail pengiriman dan info pesanan */
+.shipping-details,
+.order-info {
+    background-color: #fefefe;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+.shipping-details p,
+.order-info p {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.shipping-details p:first-child,
+.order-info p:first-child {
+    margin-top: 0;
+}
+
+.shipping-details p:last-child,
+.order-info p:last-child {
+    margin-bottom: 0;
 }
