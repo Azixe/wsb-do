@@ -77,6 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNGSI INI DIPERBAIKI UNTUK MENYIMPAN KE LOCALSTORAGE ---
     // Ganti fungsi handlePlaceOrder di checkout.js
+    const kdPelanggan = localStorage.getItem('kd_pelanggan');
+
     async function handlePlaceOrder() {
         if (!validateForm()) return;
 
@@ -93,7 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             },
             items: cart, // 'cart' sudah berisi semua detail produk
-            paymentMethod: paymentMethod
+            paymentMethod: paymentMethod,
+            kd_pelanggan: kdPelanggan
         };
 
         try {
